@@ -1,6 +1,6 @@
 # Jeu de course 2D (Python / pygame)
 
-Jeu de course de voitures en 2D vu de dessus, pour **deux joueurs** sur le même clavier, développé avec [pygame](https://www.pygame.org/) dans le cadre d'un projet universitaire. Le code suit l'architecture **MVC** (Modèle – Vue – Contrôleur) : la logique du jeu, l'affichage et la gestion des entrées sont séparés dans trois dossiers distincts.
+Prototype de jeu de course de voitures en 2D vu de dessus, développé avec [pygame](https://www.pygame.org/) dans le cadre d'un projet universitaire. Le code suit l'architecture **MVC** (Modèle – Vue – Contrôleur) : la logique du jeu, l'affichage et la gestion des entrées sont séparés dans trois dossiers distincts.
 
 ## Prérequis
 
@@ -51,15 +51,22 @@ Jeu de course de voitures en 2D vu de dessus, pour **deux joueurs** sur le même
 python main.py
 ```
 
-## Commandes du jeu
+## Commandes actuelles
 
-| Action                    | Joueur 1                | Joueur 2        |
-|---------------------------|-------------------------|-----------------|
-| Accélérer                 | `Z` (ou `W` en QWERTY)  | `↑`             |
-| Freiner / marche arrière  | `S`                     | `↓`             |
-| Tourner à gauche          | `Q` (ou `A` en QWERTY)  | `←`             |
-| Tourner à droite          | `D`                     | `→`             |
-| Action supplémentaire *(à préciser)* | `Espace`     | `Entrée`        |
+### Menu
+
+| Action       | Touche     |
+|--------------|------------|
+| Démarrer     | `Entrée`   |
+| Quitter      | `Échap`    |
+
+### Course
+
+| Action                    | Touche |
+|---------------------------|--------|
+| Accélérer la voiture      | `↑`    |
+
+> État actuel: une seule voiture est instanciée (`GameModel.car`) et seule l'action `accelerate` est mappée dans `controller/input_handler.py`.
 
 ## Structure du projet
 
@@ -80,31 +87,6 @@ python main.py
     └── input_handler.py     #   Association touches clavier → actions
 ```
 
-## Organisation du travail
+## Documentation développeur
 
-
-
-## Répartition des tâches et planning
-
-
-| Membre | Classes / fonctionnalités | Échéance |
-|--------|---------------------------|----------|
-|        |                           |          |
-|        |                           |          |
-|        |                           |          |
-
-## Déclaration d'utilisation des outils d'IA
-
-
-- [ ] Traduction / explication du sujet :
-- [ ] Conception :
-- [ ] Code :
-- [ ] Débogage :
-- [X] Commentaires et docstrings :
-- [ ] Diagramme UML :
-
-## Membres du groupe
-
-- Louis PLOTTIER — 21202191
-- Aurèle CAUCHETEUX — 21623770
-- Grégoire DUMUR — 21224117
+Voir `/home/runner/work/Mario-Kart-Python/Mario-Kart-Python/DEVELOPER.md` pour le détail du flux MVC actuel, des modules clés et des commandes de vérification disponibles dans ce dépôt.
