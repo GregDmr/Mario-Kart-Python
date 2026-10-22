@@ -50,5 +50,5 @@ class GameView:
 
         if model.circuit is None:
             return
-        surf, rect = model.car.get_rotated_sprite()
+        surf, rect = model.car.get_rotated_sprite() # a faire pour chaque voiture eventuellement
         self.screen.blit(surf, rect)

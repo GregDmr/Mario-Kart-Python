@@ -16,7 +16,7 @@ class GameModel:
         """ Charge et génère le circuit ainsi que les voitures """
         grid = [[RoadTile(col=col_idx, row=row_idx) for row_idx in range(GRID_COLS)] for col_idx in range(GRID_ROWS)]
         self.circuit = Circuit(grid=grid)
-        self.spawn_car()
+        self.spawn_car() # ici on modifie si on veut choisir le modele
 
     def spawn_car(self) -> None:
         """ Fait apparaitre la voiture """
