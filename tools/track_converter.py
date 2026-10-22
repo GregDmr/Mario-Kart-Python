@@ -6,6 +6,7 @@ import os
 import pygame
 from constants import GRID_COLS, GRID_ROWS, TILE_SIZE
 
+references = [(48, 48, 48), (0, 255, 0), (127, 51, 0), (0,255,255)]      #route, herbe, mur, eau
 
 def convert_track(chosen_track_path : str) -> list[list[int]]:
     """Convertit une image de circuit en matrice d'ID de tuiles.
@@ -24,7 +25,7 @@ def convert_track(chosen_track_path : str) -> list[list[int]]:
     """
     image = pygame.image.load(chosen_track_path) #doit etre 24 bits ou plus
     resized = pygame.transform.smoothscale(image, (GRID_COLS * TILE_SIZE, GRID_ROWS * TILE_SIZE))
-    references = [(48, 48, 48), (0, 255, 0), (127, 51, 0), (0,255,255)] #route, herbe, mur, eau
+
     matrix = []
     for row in range(GRID_ROWS):
         matrix_row = []
