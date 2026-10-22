@@ -7,7 +7,7 @@ from constants import (
 from model.game_model import GameModel
 from view.game_view import GameView
 from controller.input_handler import InputHandler
-
+from controller.music_controller import MusicController
 
 class GameController:
 
@@ -19,6 +19,7 @@ class GameController:
         self.model = GameModel() # Instanciation de notre classe GameModel
         self.view = GameView(self.screen) # Connexion entre la partie graphique et la fenêtre de l'écran
         self.input_handler = InputHandler() # Initialisation du module pour gérer les entrées de  l'utilisateur
+        self.music_handler = MusicController(self.model) #Il faut passer le modele pour que le controle de la musique sache l'etat du jeu.
         self.running = True # Booléen qui maintient la boucle du jeu active
 
     def run(self) -> None:
@@ -28,6 +29,7 @@ class GameController:
             self.handle_events() # Récupération des actions
             self.update() # Mise à jour de la logique ainsi que la position des éléments
             self.render() # Redessine tout à l'écran
+            self.music()
             self.clock.tick(FPS) # Régulation de la vitesse d'affichage du jeu
 
     def handle_events(self) -> None:
@@ -94,3 +96,6 @@ class GameController:
         self.running = False # Permet de cesser la boucle de la méthode run
         pygame.quit() # Libération de l'espace mémoire alloué à pygame
         sys.exit() # Arrêt de l'interpréteur Python
+    
+    def music(self):
+        self.music_handler.update()
