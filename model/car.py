@@ -32,7 +32,7 @@ class Car:
 
     def build_sprite(self, chosen_car) -> pygame.Surface:
         """ Construit et retourne la surface graphique (sprite) de la voiture """
-        #surf = pygame.Surface((CAR_WIDTH, CAR_HEIGHT), pygame.SRCALPHA)
+        
         directory = "assets/sprites/cars"
         files = []
         for name in sorted(os.listdir(directory)):
@@ -41,9 +41,6 @@ class Car:
                 files.append(path)
         chosen_sprite = pygame.image.load(files[chosen_car]).convert_alpha() #sprite a la bonne taille
         chosen_sprite = pygame.transform.scale(chosen_sprite,(CAR_WIDTH,CAR_HEIGHT))
-
-        #pygame.draw.rect(surf, (255, 0, 0), (0, 0, CAR_WIDTH,
-                        # CAR_HEIGHT), border_radius=5)
         return chosen_sprite
 
     def get_rotated_sprite(self) -> tuple[pygame.Surface, pygame.Rect]:
