@@ -25,7 +25,7 @@ class Car:
         #surf = pygame.Surface((CAR_WIDTH, CAR_HEIGHT), pygame.SRCALPHA)
         directory = "assets/sprites/cars"
         files = []
-        for name in os.listdir(directory):
+        for name in sorted(os.listdir(directory)):
             if name.endswith(".png"):
                 path = os.path.join(directory, name)
                 files.append(path)

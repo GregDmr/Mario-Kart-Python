@@ -1,7 +1,7 @@
 import pygame
 from controller.game_controller import GameController
 
-#test
+
 def main():
     pygame.init()
     pygame.display.set_caption("Projet Python - Jeu de course 2D")

@@ -56,7 +56,7 @@ class GameController:
         """ Gestion des touches quand l'utilisateur est dans le menu principal """
 
         # Gestion de la touche Entrée
-        if key == pygame.K_RETURN:
+        if key == pygame.K_RETURN: #Ajouter une vérif si les voitures sont choisies ? 
             self.model.load_circuit() # Chargement des données du circuit
             self.model.state = GameState.RACING # PAssa ge de l'état du jeu de MENU à RACING
 
