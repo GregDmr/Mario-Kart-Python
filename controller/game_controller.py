@@ -1,9 +1,6 @@
 import pygame
 import sys
-from constants import (
-    WINDOW_WIDTH, WINDOW_HEIGHT, FPS,
-    GameState
-)
+import constants as c
 from model.game_model import GameModel
 from view.game_view import GameView
 from controller.input_handler import InputHandler
@@ -14,7 +11,7 @@ class GameController:
     def __init__(self):
         """ Constructeur de la classe GameController """
 
-        self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT)) # Création de la fenêtre graphique
+        self.screen = pygame.display.set_mode((c.WINDOW_WIDTH, c.WINDOW_HEIGHT)) # Création de la fenêtre graphique
         self.clock = pygame.time.Clock() # Initialisation de l'horloge interne du jeu
         self.model = GameModel() # Instanciation de notre classe GameModel
         self.view = GameView(self.screen) # Connexion entre la partie graphique et la fenêtre de l'écran
@@ -30,7 +27,7 @@ class GameController:
             self.update() # Mise à jour de la logique ainsi que la position des éléments
             self.render() # Redessine tout à l'écran
             self.music()
-            self.clock.tick(FPS) # Régulation de la vitesse d'affichage du jeu
+            self.clock.tick(c.FPS) # Régulation de la vitesse d'affichage du jeu
 
     def handle_events(self) -> None:
         """ Analyse de tous les évènements depuis la frame précédente """
@@ -51,7 +48,7 @@ class GameController:
         state = self.model.state 
 
         # Si dans le menu principal
-        if state == GameState.MENU:
+        if state == c.GameState.MENU:
             self.handle_menu_key(key) # Transmission de la touche enfoncée à la méthode handle_menu_key
 
     def handle_menu_key(self, key: int) -> None:
@@ -60,7 +57,7 @@ class GameController:
         # Gestion de la touche Entrée
         if key == pygame.K_RETURN: #Ajouter une vérif si les voitures sont choisies ? 
             self.model.load_circuit() # Chargement des données du circuit
-            self.model.state = GameState.RACING # PAssa ge de l'état du jeu de MENU à RACING
+            self.model.state = c.GameState.RACING # Passage de l'état du jeu de MENU à RACING
 
         # Gestion de la touche Echap
         elif key == pygame.K_ESCAPE:
@@ -70,7 +67,7 @@ class GameController:
         """ Mise à jour de la logique du jeu et de la physique de la voiture """
         
         # Sécurité si le jeu n'est pas en cours de course
-        if self.model.state != GameState.RACING:
+        if self.model.state != c.GameState.RACING:
             return
 
         p1_input = self.input_handler.get_inputs() # Récupération d'un dictionnaire comportant toutes les actions avec un booléen
@@ -84,6 +81,11 @@ class GameController:
         # Si le joueur accélère, on appelle la méthode d'accélération définie dans la classe Car
         if player_input['accelerate']:
             car.accelerate()
+
+        if player_input['decelerate']:
+            car.decelerate()
+
+        car.friction()
 
     def render(self) -> None:
         """ Affichage de l'état du modèle dans la fenêtre de jeu """

@@ -3,6 +3,9 @@ import pygame
 # Dictionnaire de correspondance touche action
 MAPPING = {
     pygame.K_UP:     "accelerate",
+    pygame.K_DOWN:   "decelerate",
+    pygame.K_LEFT:   "turn_left",
+    pygame.K_RIGHT:  "turn_right",
 }
 
 
