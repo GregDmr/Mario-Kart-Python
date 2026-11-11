@@ -79,13 +79,7 @@ class GameController:
         """ Modification des paramètres internes de l'instance car avec les paramètres du dictionnaire player_input"""
 
         # Si le joueur accélère, on appelle la méthode d'accélération définie dans la classe Car
-        if player_input['accelerate']:
-            car.accelerate()
-
-        if player_input['decelerate']:
-            car.decelerate()
-
-        car.friction()
+        car.compute_new_metrics(player_input)
 
     def render(self) -> None:
         """ Affichage de l'état du modèle dans la fenêtre de jeu """

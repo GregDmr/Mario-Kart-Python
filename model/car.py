@@ -13,50 +13,56 @@ class Car:
         self.x = start_col * c.TILE_SIZE + c.TILE_SIZE // 2
         self.y = start_row * c.TILE_SIZE + c.TILE_SIZE // 2
 
-        # Initialisation vitesse et angle 
+        # Initialisation vitesse et angle
         self.speed: float = 0.0
         self.angle: float = 0.0
+        self.steering_angle : float = 0.0
+        self.desired_torque : float = 0.0
 
         # Génération du sprite visuel de base 
         self.sprite = self.build_sprite(chosen_car)
 
-    def accelerate(self) -> None:
-        """ Augmente la vitesse de la voiture suivant la constante d'accélération"""
-        self.speed += c.CAR_ACCELERATION
+    def compute_new_metrics(self, input_dico):
 
-        # Limitation de la vitesse de la voiture à MAX_SPEED
-        if self.speed > c.MAX_SPEED:
-            self.speed = c.MAX_SPEED
+        if input_dico["decelerate"]:
+            if self.desired_torque > 0:
+                self.desired_torque = -0.1
+            else :
+                self.desired_torque -=0.05
 
-    def decelerate(self) -> None:
-        """ Réduit la vitesse de la voiture, prend en compte le freinage ou la marche arrière"""
-        if self.speed > 0:
-            # La voiture avance : on applique uniquement le frein
-            self.speed -= c.CAR_BRAKE
-            
-            # Si le freinage fait passer la vitesse en négatif, on s'arrête net à 0 pour la transition avec la marche arrière
-            if self.speed < 0:
-                self.speed = 0.0
-                
-        else:
-            # Voiture à l'arrêt ou en vitesse négative : on applique la marche arrière
-            self.speed -= c.CAR_REVERSE
-            
-            # Limitation de la vitesse maximale en marche arrière
-            if self.speed < -c.MAX_REVERSE_SPEED:
-                self.speed = -c.MAX_REVERSE_SPEED
+        if input_dico["accelerate"]:
+            if self.desired_torque < 0:
+                self.desired_torque = 0.2
+            else :
+                self.desired_torque +=0.05      
+        if input_dico["accelerate"] and input_dico["decelerate"] :
+            self.desired_torque = 0
 
-    def friction(self) -> None:
-        """ Applique les frottements pour ralentir la voiture dans le sens opposé à sa direction actuel"""
-        if self.speed > 0:
-            self.speed -= c.CAR_FRICTION
-            if self.speed < 0:
-                self.speed = 0.0
-        elif self.speed < 0:
-            self.speed += c.CAR_FRICTION
-            if self.speed > 0:
-                self.speed = 0
+        if input_dico["turn_left"] or input_dico["turn_right"] :
+            if input_dico["turn_left"] and input_dico["turn_right"]:
+                self.steering_angle = self.steering_angle
+            if input_dico["turn_left"] and not input_dico["turn_right"]:
+                self.steering_angle-=0.1
+            if input_dico["turn_right"] and not input_dico["turn_left"]:
+                self.steering_angle+=0.1
 
+        if not (input_dico["turn_left"] or input_dico["turn_right"]):
+            if self.steering_angle >0 :
+                self.steering_angle -= min(0.05, abs(self.steering_angle))
+            if self.steering_angle <0 :
+                            self.steering_angle += min(0.05, abs(self.steering_angle))
+
+        if self.desired_torque >0 :
+             self.desired_torque = max(self.desired_torque, 1)
+        if self.desired_torque <0 :
+                     self.desired_torque = min(self.desired_torque, -1)
+
+        if self.steering_angle >0 :
+                     self.steering_angle = max(self.steering_angle, 1)
+        if self.steering_angle <0 :
+                     self.steering_angle = min(self.steering_angle, -1)
+
+                    
     def update_position(self) -> None:
         """ Met à jour la position de la voiture en fonction de sa vitesse"""
         self.y += self.speed

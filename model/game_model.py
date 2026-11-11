@@ -14,7 +14,7 @@ class GameModel:
 
     def load_circuit(self) -> None:
         """ Charge et génère le circuit ainsi que les voitures """
-        type_grid = convert_track("assets/tracks/01_test_track.png")
+        type_grid = convert_track("assets/tracks/01_test_track.png") # a modifier pour permettre choix des circuits
         grid = [[RoadTile(col=col_idx, row=row_idx, road_type=type_grid[row_idx][col_idx])for col_idx in range(GRID_COLS)] for row_idx in range(GRID_ROWS)]
         self.circuit = Circuit(grid=grid)
         self.spawn_car() # ici on modifie si on veut choisir le modele
