@@ -14,7 +14,8 @@ class Car:
         self.y = start_row * c.TILE_SIZE + c.TILE_SIZE // 2
 
         # Initialisation vitesse et angle
-        self.speed: float = 0.0
+        self.vx: float = 0.0
+        self.vy: float = 0.0
         self.angle: float = 0.0
         self.steering_angle : float = 0.0
         self.desired_torque : float = 0.0
@@ -65,8 +66,17 @@ class Car:
                     
     def update_position(self) -> None:
         """ Met à jour la position de la voiture en fonction de sa vitesse"""
-        self.y += self.speed
+        self.compute_speeds()
 
+        self.x += self.vx
+        self.y += self.vy
+        self.angle -= self.omega
+
+    def compute_speeds(self) -> float:
+        """calcule les vitesses en x et en y ainsi que la vitesse angulaire pour servir lors de la mise a jour de la position"""
+        self.vx = self.desired_torque * 1
+        self.omega = self.steering_angle * 1
+    
     def build_sprite(self, chosen_car) -> pygame.Surface:
         """ Construit et retourne la surface graphique (sprite) de la voiture """
         

@@ -78,7 +78,7 @@ class GameController:
     def apply_input(self, car, player_input) -> None:
         """ Modification des paramètres internes de l'instance car avec les paramètres du dictionnaire player_input"""
 
-        # Si le joueur accélère, on appelle la méthode d'accélération définie dans la classe Car
+        # on passe les inputs à la classe voiture qui gère ensuite la physique selon les inputs
         car.compute_new_metrics(player_input)
 
     def render(self) -> None:
