@@ -52,3 +52,6 @@ class GameView:
             return
         surf, rect = model.car.get_rotated_sprite() # a faire pour chaque voiture eventuellement
         self.screen.blit(surf, rect)
+        surf_texte = model.car.debug_variables(self.font)
+        self.screen.blit(surf_texte, (10,10))
+        
