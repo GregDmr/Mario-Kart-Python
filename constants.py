@@ -4,6 +4,8 @@ TILE_SIZE = 12
 GRID_COLS = 120
 GRID_ROWS = 68
 
+PIXEL_PER_METER = 10 #super important a définir plus tard, permet de lier la physique du modèle car avec le rendu 
+
 WINDOW_WIDTH = TILE_SIZE * GRID_COLS
 WINDOW_HEIGHT = TILE_SIZE * GRID_ROWS
 
@@ -38,4 +40,5 @@ WHEEL_BASE = [] #entraxe des roues longitudinal, METRE
 WHEEL_TRACK = [] #entraxe des roues latéral, METRE
 MAX_ENGINE_TORQUE = [20] #couple max du moteur , N * m
 CENTER_GRAVITY_Z = [0.3] #hauteur du CG en m
-CENTER_GRAVITY_X = [0.8] #position longitudinale du CG a partir des roues avant, en m 
+CENTER_GRAVITY_X = [0.8] #position longitudinale du CG a partir des roues avant, en m
+MASS = [1200]  #masse en kg
