@@ -1,9 +1,10 @@
-from constants import GameState, GRID_ROWS, GRID_COLS
+from constants import GameState, GRID_ROWS, GRID_COLS,WINDOW_HEIGHT,WINDOW_WIDTH
 from model.car import Car
 from model.circuit import Circuit
 from model.road_tile import RoadTile
 from tools.track_converter import convert_track
-
+from pygame.image import load
+from pygame.transform import scale
 class GameModel:
     """ Représentation du modèle global du jeu """
     def __init__(self):
@@ -15,6 +16,9 @@ class GameModel:
     def load_circuit(self) -> None:
         """ Charge et génère le circuit ainsi que les voitures """
         type_grid = convert_track("assets/tracks/01_test_track.png") # a modifier pour permettre choix des circuits
+
+        self.circuit_texture_render = load("assets/tracks/01_test_track.png").convert_alpha()
+        self.circuit_texture_render = scale(self.circuit_texture_render, (WINDOW_WIDTH,WINDOW_HEIGHT)) #Changements importans ici pour choisir la bonne track 
         grid = [[RoadTile(col=col_idx, row=row_idx, road_type=type_grid[row_idx][col_idx])for col_idx in range(GRID_COLS)] for row_idx in range(GRID_ROWS)]
         self.circuit = Circuit(grid=grid)
         self.spawn_car() # ici on modifie si on veut choisir le modele
