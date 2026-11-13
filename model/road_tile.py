@@ -10,7 +10,13 @@ class RoadTile:
         self.row = row # Indice de la ligne 
         self.sprite: pygame.Surface | None = None # Stockage de l'image de la tuile
         self.road_type = road_type
-    def get_sprite(self, tile_size: int = TILE_SIZE) -> pygame.Surface:
+    
+    
+    
+    
+    
+    
+    def get_sprite(self, tile_size: int = TILE_SIZE) -> pygame.Surface: #CETTE FONCTION EST INUTILE DORENAVANT. PLUS D'UTILISATIONS DES SPRITES
         """ Retourne le sprite graphique de la tuile """
 
         # Si le sprite existe et est à la bonne taille on le renvoie directement

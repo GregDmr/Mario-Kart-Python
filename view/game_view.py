@@ -42,12 +42,8 @@ class GameView:
 
     def _draw_racing(self, model: GameModel) -> None:
 
-        for row_idx, row in enumerate(model.circuit.grid):
-            for col_idx, tile in enumerate(row):
-                sprite = tile.get_sprite(TILE_SIZE)
-                self.screen.blit(
-                    sprite, (col_idx * TILE_SIZE, row_idx * TILE_SIZE))
-
+        self.screen.blit(model.circuit_texture_render,(0,0))
+        
         if model.circuit is None:
             return
         surf, rect = model.car.get_rotated_sprite() # a faire pour chaque voiture eventuellement

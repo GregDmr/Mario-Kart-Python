@@ -1,8 +1,8 @@
 FPS = 60
 
-TILE_SIZE = 12
-GRID_COLS = 120
-GRID_ROWS = 68
+TILE_SIZE = 1
+GRID_COLS = 120*12
+GRID_ROWS = 68*12
 
 PIXEL_PER_METER = 10 #super important a définir plus tard, permet de lier la physique du modèle car avec le rendu 
 
