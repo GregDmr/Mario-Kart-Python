@@ -21,6 +21,7 @@ class Car:
         self.steering_velocity = c.STEERING_VELOCITY[chosen_car]
         self.max_torque = c.MAX_ENGINE_TORQUE[chosen_car]
         self.final_drive = 10
+        self.braking_torque = 300 #attention meme ordre de grandeur que engine torque (plus grand car freinage, mais le calcul pour la force est le meme)
         self.izz = c.CAR_IZZ[chosen_car]
         propulsion = c.RWD[chosen_car]
         # Conversion des coordonnées de la grille en pixels

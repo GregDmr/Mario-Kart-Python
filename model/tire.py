@@ -19,11 +19,16 @@ class Tire :
         
         Fx=0
         Fy=0
-        
-        if self.car.desired_torque>0 and self.drived:
+
+        if self.car.desired_torque>0 and self.drived and self.car.vx>=0:
             Fx = self.car.desired_torque*self.car.final_drive * self.car.max_torque/(2*self.tire_radius)
-        elif self.car.desired_torque<0:
-            Fx = (self.car.desired_torque*self.car.final_drive * self.car.max_torque/(2*self.tire_radius))
+        elif self.car.desired_torque>0 and self.car.vx<0:
+            Fx = (self.car.desired_torque*self.car.final_drive * self.car.braking_torque/(2*self.tire_radius))
+        elif self.car.desired_torque<0 and self.car.vx>0:
+            Fx = (self.car.desired_torque*self.car.final_drive * self.car.braking_torque/(2*self.tire_radius))
+        elif self.car.desired_torque <0 and self.car.vx <=0 and self.drived:
+            Fx = self.car.desired_torque*self.car.final_drive * self.car.max_torque/(2*self.tire_radius)
+
 
         Fx-= self.car.vx * 25 #trainée basique pour frottement
         Fy = 0
