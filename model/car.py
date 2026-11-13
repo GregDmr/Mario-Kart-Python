@@ -79,7 +79,6 @@ class Car:
         self.x += self.vx * math.sin(self.angle/360*2*math.pi) + self.vy * math.cos(self.angle/360*2*math.pi)
         self.y += self.vx * math.cos(self.angle/360*2*math.pi) + self.vy * math.sin(self.angle/360*2*math.pi)
         
-
     def compute_speeds(self) -> float:
         """calcule les vitesses en x et en y ainsi que la vitesse angulaire pour servir lors de la mise a jour de la position"""
         self.vx = self.desired_torque * 5
