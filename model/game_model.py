@@ -2,6 +2,7 @@ from constants import GameState, GRID_ROWS, GRID_COLS,WINDOW_HEIGHT,WINDOW_WIDTH
 from model.car import Car
 from model.circuit import Circuit
 from model.road_tile import RoadTile
+from model.menu import Menu, MainMenu
 from tools.track_converter import convert_track
 from pygame.image import load
 from pygame.transform import scale
@@ -12,6 +13,24 @@ class GameModel:
         self.state: str = GameState.MENU # Etat du jeu, menu par défaut
         self.circuit: Circuit | None = None # Référence vers le circuit actif
         self.car: Car | None = None # Référence vers la voiture du joueur
+
+        # Un menu par état qui en a un
+        self.menus: dict[str, Menu] = {
+            GameState.MENU: MainMenu(self),
+        }
+
+    def current_menu(self):
+        """Menu de l'état courant, ou None """
+        return self.menus.get(self.state)  #get renvoie None si l'état n'a pas de menu (ex : RACING)
+
+    def change_state(self, new_state: str):
+        """Change d'écran """
+        self.state = new_state
+
+    def start_race(self):
+        """Charge le circuit et lance la course """
+        self.load_circuit()
+        self.change_state(GameState.RACING)
 
     def load_circuit(self) -> None:
         """ Charge et génère le circuit ainsi que les voitures """

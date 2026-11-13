@@ -6,12 +6,16 @@ from view.game_view import GameView
 from controller.input_handler import InputHandler
 from controller.music_controller import MusicController
 
+UP_KEYS = (pygame.K_UP, pygame.K_z)  #Les deux joueurs peuvent naviguer dans les menus
+DOWN_KEYS = (pygame.K_DOWN, pygame.K_s)
+
+
 class GameController:
 
     def __init__(self):
         """ Constructeur de la classe GameController """
 
-        self.screen = pygame.display.set_mode((c.WINDOW_WIDTH, c.WINDOW_HEIGHT)) # Création de la fenêtre graphique
+        self.screen = pygame.display.set_mode((c.WINDOW_WIDTH, c.WINDOW_HEIGHT), pygame.SCALED | pygame.RESIZABLE) # Création de la fenêtre graphique (SCALED : l'image s'adapte à la taille de la fenêtre)
         self.clock = pygame.time.Clock() # Initialisation de l'horloge interne du jeu
         self.model = GameModel() # Instanciation de notre classe GameModel
         self.view = GameView(self.screen) # Connexion entre la partie graphique et la fenêtre de l'écran
@@ -44,28 +48,34 @@ class GameController:
     def handle_keydown(self, key: int) -> None:
         """ Aiguille l'action d'une touche selon l'état actuel du jeu """
 
-        # Récupération de l'état actuel du jeu (menu, course, ...)
-        state = self.model.state 
+        if key == pygame.K_F11:  #Passage en plein écran (si on fait F11)
+            try:
+                pygame.display.toggle_fullscreen()
+            except pygame.error:
+                print("Plein écran non disponible")  #pour handle si pas possible de passer en plein écran sans faire crash le jeu
+            return
 
-        # Si dans le menu principal
-        if state == c.GameState.MENU:
-            self.handle_menu_key(key) # Transmission de la touche enfoncée à la méthode handle_menu_key
+        menu = self.model.current_menu()
+        if menu is not None:  #Si on est dans un menu
+            self.handle_menu_key(menu, key)
 
-    def handle_menu_key(self, key: int) -> None:
-        """ Gestion des touches quand l'utilisateur est dans le menu principal """
+        if self.model.state == c.GameState.QUIT:  #Le menu a demandé à quitter : c'est le contrôleur qui arrête le jeu
+            self.quit()
 
-        # Gestion de la touche Entrée
-        if key == pygame.K_RETURN: #Ajouter une vérif si les voitures sont choisies ? 
-            self.model.load_circuit() # Chargement des données du circuit
-            self.model.state = c.GameState.RACING # Passage de l'état du jeu de MENU à RACING
-
-        # Gestion de la touche Echap
+    def handle_menu_key(self, menu, key: int):
+        """Mêmes touches pour tous les menus """
+        if key in UP_KEYS:
+            menu.move(-1)
+        elif key in DOWN_KEYS:
+            menu.move(1)
+        elif key == pygame.K_RETURN:
+            menu.select()  #Chaque menu fait sa propre action
         elif key == pygame.K_ESCAPE:
-            self.quit() # Execution de la méthode de sortie de jeu
+            menu.back()
 
     def update(self) -> None:
         """ Mise à jour de la logique du jeu et de la physique de la voiture """
-        
+
         # Sécurité si le jeu n'est pas en cours de course
         if self.model.state != c.GameState.RACING:
             return
@@ -92,6 +102,6 @@ class GameController:
         self.running = False # Permet de cesser la boucle de la méthode run
         pygame.quit() # Libération de l'espace mémoire alloué à pygame
         sys.exit() # Arrêt de l'interpréteur Python
-    
+
     def music(self):
         self.music_handler.update()

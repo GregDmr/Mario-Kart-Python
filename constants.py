@@ -4,7 +4,7 @@ TILE_SIZE = 1
 GRID_COLS = 120*12
 GRID_ROWS = 68*12
 
-PIXEL_PER_METER = 10 #super important a définir plus tard, permet de lier la physique du modèle car avec le rendu 
+PIXEL_PER_METER = 10 #super important a définir plus tard, permet de lier la physique du modèle car avec le rendu
 
 WINDOW_WIDTH = TILE_SIZE * GRID_COLS
 WINDOW_HEIGHT = TILE_SIZE * GRID_ROWS
@@ -23,6 +23,7 @@ CAR_HEIGHT = 50
 class GameState:
     MENU = "menu"
     RACING = "racing"
+    QUIT = "quit"
 
 
 # --- Couleurs UI ---
@@ -31,6 +32,7 @@ COLOR_TEXT = (240, 240, 240)
 COLOR_ACCENT = (255, 200, 0)
 COLOR_PANEL = (30, 30, 50)
 COLOR_PANEL_BORDER = (60, 60, 100)
+COLOR_HINT = (150, 150, 170)
 
 #Charactéristiques des voitures, placeholder pour le moment
 
