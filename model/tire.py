@@ -30,7 +30,7 @@ class Tire :
             Fx = self.car.desired_torque*self.car.final_drive * self.car.max_torque/(2*self.tire_radius)
 
 
-        Fx-= self.car.vx * 25 #trainée basique pour frottement
+        Fx-= self.car.vx * 50 #trainée basique pour frottement
         Fy = 0
         return (Fx,Fy)
 
