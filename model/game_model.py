@@ -34,9 +34,8 @@ class GameModel:
     def spawn_cubes(self) -> None:
         "Fait apparaitre les cubes sur la piste"
         self.items = [ItemBox(436,152), ItemBox(1302,418), ItemBox(910,698)]
-        
-
-    def update(self) -> None:
+    
+    def update(self, audio_controller=None) -> None:
         """ Fonction de mise à jour du jeu pendant la course """
 
         # Sécurité si le jeu n'est pas en cours de course ou si aucun circuit n'est chargé
@@ -51,6 +50,6 @@ class GameModel:
             # Vérifie si le délai de 3 secondes est écoulé pour faire réapparaître l'objet
             item.update()
 
-            # Collision uniquement si l'objet est actif et qu'il touche la voiture (Modification nécessaire dans car.py)
+            # Collision uniquement si l'objet est actif et qu'il touche la voiture
             if item.is_active and self.car.get_rect().colliderect(item.rect):
-                item.on_collision(self.car)
+                item.collision(self.car, audio_controller)
