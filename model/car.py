@@ -5,11 +5,13 @@ import constants as c
 from constants import PIXEL_PER_METER as ppm
 from model.tire import Tire
 from tools.degree_trig import sind, cosd
+from model.circuit import Circuit
 class Car:
 
-    def __init__(self, start_col: int, start_row: int, chosen_car : int =0):
+    def __init__(self, circuit :Circuit, start_col: int, start_row: int, chosen_car : int =0):
         """ Initialise une voiture à partir de sa position sur la grille """
-
+        #circuit a passer au pneu
+        self.circuit = circuit
         #Attributs
         self.mass = c.MASS[chosen_car]
         self.wheelbase = c.WHEEL_BASE[chosen_car]

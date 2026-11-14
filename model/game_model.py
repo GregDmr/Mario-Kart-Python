@@ -25,7 +25,7 @@ class GameModel:
 
     def spawn_car(self) -> None:
         """ Fait apparaitre la voiture """
-        self.car = Car(7, 1)
+        self.car = Car(self.circuit,200, 200,0)
 
     def update(self) -> None:
         """ Fonction de mise à jour du jeu pendant la course """

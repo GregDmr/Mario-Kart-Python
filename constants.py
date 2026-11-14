@@ -18,8 +18,9 @@ CAR_BRAKE = 0.1
 CAR_REVERSE = 0.02
 CAR_FRICTION = 0.01
 
+#Propriétés des ROAD_TILES
 
-
+FRICTION_COEFFS = [0.9,0.4,0,0.1] #route, herbe, mur, glace
 
 class GameState:
     MENU = "menu"

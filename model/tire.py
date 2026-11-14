@@ -1,6 +1,7 @@
 import constants as c
 from constants import PIXEL_PER_METER as ppm
 from tools.degree_trig import sind, cosd
+
 class Tire :
 
     def __init__(self, car, offset_width : float, offset_length: float, drived :bool):
@@ -14,9 +15,12 @@ class Tire :
 
     def compute_forces(self):
         #offsets en mètres (x avant, y gauche), position de la voiture en pixels
-        pos_x = self.car.x + ppm*self.offset_width*cosd(self.car.angle) + ppm*self.offset_length*sind(self.car.angle)
-        pos_y = self.car.y - ppm*self.offset_width*sind(self.car.angle) + ppm*self.offset_length*cosd(self.car.angle)
         
+        tile = self.get_tile()
+        if tile is not None:
+            friction_coef = c.FRICTION_COEFFS[tile.road_type]
+        else :
+            friction_coef = c.FRICTION_COEFFS[1]
         Fx=0
         Fy=0
 
@@ -34,3 +38,10 @@ class Tire :
         Fy = 0
         return (Fx,Fy)
 
+    def get_tile(self):
+        """Retourne un objet RoadTile pour le pneu contenant les attributs nécéssaires"""
+
+        pos_x = self.car.x + ppm*self.offset_width*cosd(self.car.angle) + ppm*self.offset_length*sind(self.car.angle)
+        pos_y = self.car.y - ppm*self.offset_width*sind(self.car.angle) + ppm*self.offset_length*cosd(self.car.angle)
+        current_tile = self.car.circuit.get_tile_at_pixel(pos_x,pos_y) #objet RoadTile
+        return current_tile
