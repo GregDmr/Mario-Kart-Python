@@ -5,11 +5,13 @@ import constants as c
 from constants import PIXEL_PER_METER as ppm
 from model.tire import Tire
 from tools.degree_trig import sind, cosd
+from model.circuit import Circuit
 class Car:
 
-    def __init__(self, start_col: int, start_row: int, chosen_car : int =0):
+    def __init__(self, circuit :Circuit, start_col: int, start_row: int, chosen_car : int =0):
         """ Initialise une voiture à partir de sa position sur la grille """
-
+        #circuit a passer au pneu
+        self.circuit = circuit
         #Attributs
         self.mass = c.MASS[chosen_car]
         self.wheelbase = c.WHEEL_BASE[chosen_car]
@@ -19,11 +21,14 @@ class Car:
         self.car_height = c.CAR_HEIGHT[chosen_car]
         self.car_width = c.CAR_WIDTH[chosen_car]
         self.steering_velocity = c.STEERING_VELOCITY[chosen_car]
+        self.steering_range = c.STEERING_RANGE[chosen_car]
         self.max_torque = c.MAX_ENGINE_TORQUE[chosen_car]
-        self.final_drive = 10
+        
         self.braking_torque = 300 #attention meme ordre de grandeur que engine torque (plus grand car freinage, mais le calcul pour la force est le meme)
         self.izz = c.CAR_IZZ[chosen_car]
         propulsion = c.RWD[chosen_car]
+        self.final_drive = 4
+        self.engine_speed_max = 750 #les deux valeurs a equilibrer en essais.
         # Conversion des coordonnées de la grille en pixels
         self.x = start_col * c.TILE_SIZE + c.TILE_SIZE // 2
         self.y = start_row * c.TILE_SIZE + c.TILE_SIZE // 2
@@ -33,8 +38,10 @@ class Car:
         self.vy: float = 0.0
         self.omegad :float = 0.0
         self.angle: float = 0.0
-        self.steering_angle : float = 0.0
-        self.desired_torque : float = 0.0
+        self.steering_multiplier : float = 0.0 #entre -1 et 1
+        self.steering_angle : float = 0.0 #radians
+        self.torque_multiplier : float = 0.0 #entre -1 et 1
+        self.desired_torque : float = 0.0 #N.m
         self.angle : float =0.0
         # Génération du sprite visuel de base 
         self.sprite = self.build_sprite(chosen_car)
@@ -52,49 +59,77 @@ class Car:
 
     def compute_new_metrics(self, input_dico):
 
-        if input_dico["decelerate"]: #La réponse de l'accelerateur est hard codé volontairement, moins d'importance que le steering angle donc reste constant
-            if self.desired_torque > 0:
-                self.desired_torque = -0.1
+        # torque_multiplier entre -1 et 1 : la logique d'incrémentation reste hard codée volontairement
+        if input_dico["decelerate"]:
+            if self.torque_multiplier > 0:
+                self.torque_multiplier = -0.1
             else :
-                self.desired_torque -=0.05
+                self.torque_multiplier -= 0.05
 
         if input_dico["accelerate"]:
-            if self.desired_torque < 0:
-                self.desired_torque = 0.2 #l'acceleration commence pas a 0 pour la nervosité
+            if self.torque_multiplier < 0:
+                self.torque_multiplier = 0.2 #l'acceleration commence pas a 0 pour la nervosité
             else :
-                self.desired_torque +=0.05      
+                self.torque_multiplier += 0.05
         if (input_dico["accelerate"] and input_dico["decelerate"]) or (not input_dico["accelerate"] and not input_dico["decelerate"]) :
-            self.desired_torque = 0 #si on ne fait rien ou on appuie sur les 2 : couple demandé est nul
+            self.torque_multiplier = 0 #si on ne fait rien ou on appuie sur les 2 : couple demandé est nul
 
-        if input_dico["turn_left"] or input_dico["turn_right"] :
-            if input_dico["turn_left"] and input_dico["turn_right"]:
-                self.steering_angle = self.steering_angle
-            if input_dico["turn_left"] and not input_dico["turn_right"]:
-                if self.steering_angle<0.3 :
-                     self.steering_angle+=self.steering_velocity
-                else :
-                    self.steering_angle+=self.steering_velocity/4
-            if input_dico["turn_right"] and not input_dico["turn_left"]:
-                if self.steering_angle>-0.3 :
-                    self.steering_angle-=self.steering_velocity
-                else :
-                    self.steering_angle-=self.steering_velocity/4
+        self.torque_multiplier = max(-1, min(1, self.torque_multiplier))
+        self.desired_torque = self.compute_desired_torque() #en N.m
 
-        if not (input_dico["turn_left"] or input_dico["turn_right"]):
-            if self.steering_angle >0 :
-                self.steering_angle -= min(0.05, abs(self.steering_angle))
-            if self.steering_angle <0 :
-                            self.steering_angle += min(0.05, abs(self.steering_angle))
+        if input_dico["turn_left"] and not input_dico["turn_right"]:
+            self.turn_left()
+        elif input_dico["turn_right"] and not input_dico["turn_left"]:
+            self.turn_right()
+        elif not input_dico["turn_left"] and not input_dico["turn_right"]:
+            if self.steering_multiplier > 0 :
+                self.steering_multiplier -= min(0.05, abs(self.steering_multiplier))
+            if self.steering_multiplier < 0 :
+                self.steering_multiplier += min(0.05, abs(self.steering_multiplier))
 
-        if self.desired_torque >0 :
-             self.desired_torque = min(self.desired_torque, 1)
-        if self.desired_torque <0 :
-                     self.desired_torque = max(self.desired_torque, -1)
+        self.steering_multiplier = max(-1, min(1, self.steering_multiplier))
+        self.steering_angle = self.steering_multiplier * self.steering_range #en radians
 
-        if self.steering_angle >0 :
-                     self.steering_angle = min(self.steering_angle, 1)
-        if self.steering_angle <0 :
-                     self.steering_angle = max(self.steering_angle, -1)
+    def compute_desired_torque(self) -> float:
+        """ Couple demandé en N.m selon le multiplicateur et le sens de marche """
+        if self.torque_multiplier > 0 and self.vx >= 0:
+            return self.accelerate_forward_torque()
+        if self.torque_multiplier > 0 and self.vx < 0:
+            return self.brake_reverse_torque()
+        if self.torque_multiplier < 0 and self.vx > 0:
+            return self.brake_forward_torque()
+        if self.torque_multiplier < 0 and self.vx <= 0:
+            return self.accelerate_reverse_torque()
+        return self.coasting_torque()
+
+    def accelerate_forward_torque(self) -> float:
+        return self.torque_multiplier * self.max_torque #positif
+
+    def accelerate_reverse_torque(self) -> float:
+        return self.torque_multiplier * self.max_torque #négatif
+
+    def brake_forward_torque(self) -> float:
+        return self.torque_multiplier * self.braking_torque #négatif, s'oppose à vx > 0
+
+    def brake_reverse_torque(self) -> float:
+        return self.torque_multiplier * self.braking_torque #positif, s'oppose à vx < 0
+
+    def coasting_torque(self) -> float:
+        return 0.0
+
+    def turn_left(self) -> None:
+        """ Braque à gauche, plus lentement quand le volant est déjà bien tourné """
+        if self.steering_multiplier < 0.3 :
+            self.steering_multiplier += self.steering_velocity
+        else :
+            self.steering_multiplier += self.steering_velocity/4
+
+    def turn_right(self) -> None:
+        """ Braque à droite, plus lentement quand le volant est déjà bien tourné """
+        if self.steering_multiplier > -0.3 :
+            self.steering_multiplier -= self.steering_velocity
+        else :
+            self.steering_multiplier -= self.steering_velocity/4
 
                     
     def update_position(self) -> None:
@@ -120,7 +155,7 @@ class Car:
             fx_tot+= fx
             fy_tot+= fy
             mom_tot += tire.offset_length * fy - tire.offset_width * fx
-
+        fx_tot -= self.vx *abs(self.vx) * 0.5 + 0.3 * self.vx 
         ax=fx_tot/self.mass
         ay = fy_tot/self.mass
 
@@ -133,7 +168,15 @@ class Car:
         self.vx += accels[0] * dt #m/s
         self.vy += accels[1] * dt #m/s
         self.omegad = self.steering_angle *3
+        if abs(self.vx) < 0.05 and self.desired_torque == 0:
+            self.vx = 0
         #self.omegad += accels[2] * dt #rad/s POUR PLUS TARD
+
+    def engine_behavior(self, tire_speed):
+        """Sert a plafonner la vitesse du moteur (le couple), retourne un multiplicateur pour le couple moteur"""
+        x = min(abs(tire_speed) * self.final_drive / self.engine_speed_max, 1)
+        return 1 - x**5
+
     
     def build_sprite(self, chosen_car) -> pygame.Surface:
         """ Construit et retourne la surface graphique (sprite) de la voiture """

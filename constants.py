@@ -18,9 +18,14 @@ CAR_BRAKE = 0.1
 CAR_REVERSE = 0.02
 CAR_FRICTION = 0.01
 
+#Propriétés des ROAD_TILES
 
+FRICTION_COEFFS = [0.9,0.4,0,0.1] #route, herbe, mur, glace
 
-
+#Coefficients de la Magic Tire Equation
+PACEJKA_B_LONG = 10
+PACEJKA_C_LONG = 1.4
+PACEJKA_E_LONG = -1
 class GameState:
     MENU = "menu"
     RACING = "racing"
@@ -37,7 +42,7 @@ COLOR_PANEL_BORDER = (60, 60, 100)
 RWD = [1,0] #bool, true si propulsion, false si traction
 STEERING_VELOCITY = [0.1,0.15] #Vitesse de rotation du volant, valeur sans unité
 STEERING_RANGE = [0.8,1.1] #angle max de rotation des roues , RADIAN
-WHEEL_BASE = [3] #entraxe des roues longitudinal, METRE
+WHEEL_BASE = [4] #entraxe des roues longitudinal, METRE
 WHEEL_TRACK = [1.9] #entraxe des roues latéral, METRE
 MAX_ENGINE_TORQUE = [160] #couple max du moteur , N * m
 CENTER_GRAVITY_Z = [0.3] #hauteur du CG en m
