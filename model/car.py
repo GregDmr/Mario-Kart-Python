@@ -50,6 +50,16 @@ class Car:
             Tire(self,-side_offset,rear_offset,propulsion),#RR
             Tire(self,side_offset,rear_offset,propulsion)] #RL
 
+    def get_rect(self) -> pygame.Rect:
+        """Calcule et renvoie le rectangle de collision pour la voiture."""
+        centre_x = round(self.x - sind(self.angle) * self.center_grav_x * ppm)
+        centre_y = round(self.y - cosd(self.angle) * self.center_grav_x * ppm)
+
+        rect = pygame.Rect(0, 0, self.car_width * ppm, self.car_height * ppm)
+        rect.center = (centre_x, centre_y)  # On positionne le centre ici !
+        return rect
+
+
     def compute_new_metrics(self, input_dico):
 
         if input_dico["decelerate"]: #La réponse de l'accelerateur est hard codé volontairement, moins d'importance que le steering angle donc reste constant

@@ -52,5 +52,5 @@ class GameModel:
             item.update()
 
             # Collision uniquement si l'objet est actif et qu'il touche la voiture (Modification nécessaire dans car.py)
-            #if item.is_active and self.car.rect.colliderect(item.rect):
-                #item.on_collision(self.car)
+            if item.is_active and self.car.get_rect().colliderect(item.rect):
+                item.on_collision(self.car)
