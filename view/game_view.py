@@ -50,4 +50,14 @@ class GameView:
         self.screen.blit(surf, rect)
         surf_texte = model.car.debug_variables(self.font)
         self.screen.blit(surf_texte, (10,10))
+
+        # Affichage des items sur la piste (cubes, bananes, etc)
+        for item in model.items:
+            item.draw(self.screen)
+        
+        # Affichage des coordonnées de la souris en temps réel (Debug)
+        mx, my = pygame.mouse.get_pos()
+        mouse_surf = self.font.render(f"Souris: ({mx}, {my})", True, (255, 255, 0))
+        self.screen.blit(mouse_surf, (WINDOW_WIDTH - 200, 10))
+        
         

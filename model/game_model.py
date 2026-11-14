@@ -5,6 +5,8 @@ from model.road_tile import RoadTile
 from tools.track_converter import convert_track
 from pygame.image import load
 from pygame.transform import scale
+from model.item import ItemBox
+
 class GameModel:
     """ Représentation du modèle global du jeu """
     def __init__(self):
@@ -12,6 +14,7 @@ class GameModel:
         self.state: str = GameState.MENU # Etat du jeu, menu par défaut
         self.circuit: Circuit | None = None # Référence vers le circuit actif
         self.car: Car | None = None # Référence vers la voiture du joueur
+        self.items = [] # Liste des cubes présents sur la piste
 
     def load_circuit(self) -> None:
         """ Charge et génère le circuit ainsi que les voitures """
@@ -22,12 +25,17 @@ class GameModel:
         grid = [[RoadTile(col=col_idx, row=row_idx, road_type=type_grid[row_idx][col_idx])for col_idx in range(GRID_COLS)] for row_idx in range(GRID_ROWS)]
         self.circuit = Circuit(grid=grid)
         self.spawn_car() # ici on modifie si on veut choisir le modele
+        self.spawn_cubes()
 
     def spawn_car(self) -> None:
         """ Fait apparaitre la voiture """
         self.car = Car(self.circuit,200, 200,0)
 
-    def update(self) -> None:
+    def spawn_cubes(self) -> None:
+        "Fait apparaitre les cubes sur la piste"
+        self.items = [ItemBox(436,152), ItemBox(1302,418), ItemBox(910,698)]
+    
+    def update(self, audio_controller=None) -> None:
         """ Fonction de mise à jour du jeu pendant la course """
 
         # Sécurité si le jeu n'est pas en cours de course ou si aucun circuit n'est chargé
@@ -36,3 +44,12 @@ class GameModel:
 
         # Mise à jour de la position de la voiture et de ses propriétés internes
         self.car.update_position()
+
+        # Gestion des objets (réapparition + collisions)
+        for item in self.items:
+            # Vérifie si le délai de 3 secondes est écoulé pour faire réapparaître l'objet
+            item.update()
+
+            # Collision uniquement si l'objet est actif et qu'il touche la voiture
+            if item.is_active and self.car.get_rect().colliderect(item.rect):
+                item.collision(self.car, audio_controller)
