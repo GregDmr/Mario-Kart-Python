@@ -22,6 +22,10 @@ CAR_FRICTION = 0.01
 
 FRICTION_COEFFS = [0.9,0.4,0,0.1] #route, herbe, mur, glace
 
+#Coefficients de la Magic Tire Equation
+PACEJKA_B_LONG = 10
+PACEJKA_C_LONG = 1.4
+PACEJKA_E_LONG = -1
 class GameState:
     MENU = "menu"
     RACING = "racing"
