@@ -46,4 +46,6 @@ CENTER_GRAVITY_X = [0.2] #position longitudinale du CG a partir du centre geomé
 MASS = [600]  #masse en kg
 CAR_WIDTH = [2] #m
 CAR_HEIGHT = [4.7]#m
+WHEEL_LENGTH = [0.6] #m, taille de la roue vue de dessus, dans le sens de roulage
+WHEEL_WIDTH = [0.3] #m
 CAR_IZZ = [1500] #KG * m²

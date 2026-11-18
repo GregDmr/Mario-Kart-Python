@@ -20,6 +20,8 @@ class Car:
         self.center_grav_z = c.CENTER_GRAVITY_Z[chosen_car]
         self.car_height = c.CAR_HEIGHT[chosen_car]
         self.car_width = c.CAR_WIDTH[chosen_car]
+        self.wheel_length = c.WHEEL_LENGTH[chosen_car]
+        self.wheel_width = c.WHEEL_WIDTH[chosen_car]
         self.steering_velocity = c.STEERING_VELOCITY[chosen_car]
         self.steering_range = c.STEERING_RANGE[chosen_car]
         self.max_torque = c.MAX_ENGINE_TORQUE[chosen_car]
@@ -175,8 +177,13 @@ class Car:
             fy_tot +=fy_car
 
             mom_tot += tire.offset_length * fy_car - tire.offset_width * fx_car
-        fx_tot -= self.vx *abs(self.vx) * 0.5 + 0.3 * self.vx #friction du a l'air (vitesse carrée) et linéaire (vitesse lineaire)
-       
+        fx_tot -= self.vx *abs(self.vx) * 0.6 + 0.5 * self.vx #friction du a l'air (vitesse carrée) et linéaire (vitesse lineaire)
+        
+        if self.vx >= 0.2:
+            fx_tot -= 30
+        elif self.vx <= -0.2:
+            fx_tot += 30 #resistance de roulement 
+
         ax = fx_tot/self.mass + self.omegad*self.vy #le terme de rotation des vecteurs vitesse était oublié : la voiture pouvait garder sa vitesse vx dans les virages sans cout
         ay = fy_tot/self.mass - self.omegad*self.vx
 
@@ -190,8 +197,11 @@ class Car:
         self.vx += accels[0] * dt #m/s
         self.vy += accels[1] * dt #m/s
         self.omegad += accels[2] *dt #rad/s
-        if abs(self.vx) < 0.05 and self.desired_torque == 0:
+        if abs(self.vx) < 0.5 and self.desired_torque == 0:
             self.vx = 0
+
+        if abs(self.vy) < 0.2 and self.desired_torque == 0:
+                    self.vy = 0
        
 
     def engine_behavior(self, tire_speed):
@@ -211,13 +221,40 @@ class Car:
                 files.append(path)
         chosen_sprite = pygame.image.load(files[chosen_car]).convert_alpha() #sprite a la bonne taille
         chosen_sprite = pygame.transform.scale(chosen_sprite,(self.car_width*ppm,self.car_height*ppm))
-        return chosen_sprite
+
+        #surface un peu plus grande que la voiture, pour que les roues puissent dépasser de la carrosserie
+        self.sprite_pad = 3
+        pad = self.sprite_pad
+        sprite = pygame.Surface((chosen_sprite.get_width() + 2*pad, chosen_sprite.get_height() + 2*pad), pygame.SRCALPHA)
+        sprite.blit(chosen_sprite, (pad, pad))
+
+        #roue : rectangle sombre, grand côté dans le sens de roulage
+        self.wheel = pygame.Surface((round(self.wheel_width*ppm), round(self.wheel_length*ppm)), pygame.SRCALPHA)
+        self.wheel.fill((25, 25, 25))
+
+        for side in (-1, 1):
+            rect = self.wheel.get_rect(center=self.wheel_position(side, -1))
+            sprite.blit(self.wheel, rect)
+        return sprite
+
+    def wheel_position(self, side, end) -> tuple[int, int]:
+        """Centre d'une roue sur le sprite, voiture non tournée. side : -1 / 1 (un côté / l'autre), end : 1 avant, -1 arrière"""
+        x = self.sprite_pad + self.car_width*ppm/2 + side * self.wheeltrack/2 * ppm
+        y = self.sprite_pad + self.car_height*ppm/2 + end * self.wheelbase/2 * ppm
+        return round(x), round(y)
 
     def get_rotated_sprite(self) -> tuple[pygame.Surface, pygame.Rect]:
         """ Calcule et retourne le sprite pivoté selon l'angle actuel ainsi que son rectangle centré positionné pour l'affichage """
 
         # Rotation de l'image de base (le moins a été retiré, afin de convenir au sens trigonométrique)
-        rotated = pygame.transform.rotate(self.sprite, self.angle)
+        #les roues avant tournent avec le braquage : dessinées sur une copie du sprite à chaque image
+        frame = self.sprite.copy()
+        front_wheel = pygame.transform.rotate(self.wheel, math.degrees(self.steering_angle))
+        for side in (-1, 1):
+            wheel_rect = front_wheel.get_rect(center=self.wheel_position(side, 1))
+            frame.blit(front_wheel, wheel_rect)
+
+        rotated = pygame.transform.rotate(frame, self.angle)
 
         # Recalcule le rectangle de l'image en fixant son centre exact sur les coordonnées (x,y) de la voiture offset par le cg (indispensable car une rotation va modifier les dimensions globales de l'image)
         rect = rotated.get_rect(center=(round(self.x - sind(self.angle)*self.center_grav_x*ppm), round(self.y - cosd(self.angle)*self.center_grav_x*ppm)))
