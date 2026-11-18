@@ -1,3 +1,4 @@
+import os
 import pygame
 from constants import (
     WINDOW_WIDTH, WINDOW_HEIGHT, TILE_SIZE,
@@ -5,9 +6,15 @@ from constants import (
     GameState
 )
 from model.game_model import GameModel
-from model.menu import Menu
+from model.menu import Menu, track_name
 
 MAX_VISIBLE_OPTIONS = 6  #Au-delà, la liste défile
+
+HINTS = {  #Rappel des touches propre à chaque écran
+    GameState.MENU: "↑ ↓ : choisir    Entrée : valider    Echap : quitter",
+    GameState.TRACK_SELECT: "↑ ↓ : choisir    Entrée : lancer la course    Echap : retour",
+    GameState.PAUSE: "↑ ↓ : choisir    Entrée : valider    Echap : reprendre",
+}
 
 
 class GameView:
@@ -30,6 +37,11 @@ class GameView:
             self._draw_menu(menu, panel=True)
         elif menu is not None:  #Si on est dans un menu (peu importe lequel)
             self._draw_menu(menu)
+        elif model.state == GameState.LOADING:
+            self._draw_loading(model.pending_track)
+
+        if model.state in HINTS:
+            self._draw_hint(HINTS[model.state])
         pygame.display.flip()
 
     def _draw_menu(self, menu: Menu, panel: bool = False):
@@ -68,8 +80,17 @@ class GameView:
         if preview:
             self._draw_preview_panel(preview, menu.options[menu.selected])
 
-        hint = self.hint_font.render("↑ ↓ : choisir    Entrée : valider    Echap : retour", True, COLOR_HINT)
+    def _draw_hint(self, text: str):
+        """Rappel des touches en bas de l'écran"""
+        hint = self.hint_font.render(text, True, COLOR_HINT)
         self.screen.blit(hint, hint.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT - 40)))
+
+    def _draw_loading(self, track_path: str):
+        """Ecran affiché pendant le chargement du circuit"""
+        text = self.title_font.render("Chargement...", True, COLOR_ACCENT)
+        self.screen.blit(text, text.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 - 30)))
+        name = self.name_font.render(track_name(os.path.basename(track_path)), True, COLOR_TEXT)  #basename : on garde "01_test_track.png" sans le dossier
+        self.screen.blit(name, name.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 40)))
 
     def _draw_veil(self):
         """Voile sombre semi-transparent sur tout l'écran"""

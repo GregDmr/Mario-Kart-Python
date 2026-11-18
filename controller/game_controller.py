@@ -61,6 +61,10 @@ class GameController:
         elif self.model.state == c.GameState.RACING and key == pygame.K_ESCAPE:  #Pas de menu en course : Echap ouvre la pause
             self.model.change_state(c.GameState.PAUSE)
 
+        if self.model.state == c.GameState.LOADING:  #Un circuit vient d'être choisi
+            self.render()  #On affiche l'écran de chargement avant de charger, sinon il n'apparaîtrait jamais
+            self.model.start_race()
+
         if self.model.state == c.GameState.QUIT:  #Le menu a demandé à quitter : c'est le contrôleur qui arrête le jeu
             self.quit()
 

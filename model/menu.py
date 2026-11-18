@@ -80,7 +80,7 @@ class TrackMenu(Menu):
         super().__init__(game_model, [track_name(n) for n in names])
 
     def select(self):
-        self.game_model.start_race(self.tracks[self.selected])
+        self.game_model.prepare_race(self.tracks[self.selected])  #La course est chargée à l'écran suivant
 
     def back(self):
         self.game_model.change_state(GameState.MENU)

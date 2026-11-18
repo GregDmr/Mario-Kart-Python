@@ -25,6 +25,7 @@ PACEJKA_E_LAT = -2.2 #place le pic à un glissement d'environ 0.15, comme en lon
 class GameState:
     MENU = "menu"
     TRACK_SELECT = "track_select"
+    LOADING = "loading"
     RACING = "racing"
     PAUSE = "pause"
     QUIT = "quit"

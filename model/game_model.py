@@ -16,6 +16,7 @@ class GameModel:
         self.circuit: Circuit | None = None # Référence vers le circuit actif
         self.car: Car | None = None # Référence vers la voiture du joueur
         self.items = [] # Liste des cubes présents sur la piste
+        self.pending_track: str | None = None  #Circuit choisi, chargé pendant l'écran de chargement
 
         # Un menu par état qui en a un
         self.menus: dict[str, Menu] = {
@@ -34,9 +35,14 @@ class GameModel:
         if new_state == GameState.PAUSE:  #La pause s'ouvre toujours sur "Reprendre"
             self.menus[GameState.PAUSE].selected = 0
 
-    def start_race(self, track_path: str):
-        """Charge le circuit choisi et lance la course"""
-        self.load_circuit(track_path)
+    def prepare_race(self, track_path: str):
+        """Retient le circuit choisi et passe à l'écran de chargement"""
+        self.pending_track = track_path
+        self.change_state(GameState.LOADING)
+
+    def start_race(self):
+        """Charge le circuit retenu et lance la course"""
+        self.load_circuit(self.pending_track)
         self.change_state(GameState.RACING)
 
     def load_circuit(self, track_path: str) -> None:
