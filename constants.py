@@ -11,16 +11,9 @@ PIXEL_PER_METER = 10#super important a définir plus tard, permet de lier la phy
 WINDOW_WIDTH = TILE_SIZE * GRID_COLS
 WINDOW_HEIGHT = TILE_SIZE * GRID_ROWS
 
-MAX_SPEED = 4
-MAX_REVERSE_SPEED = 2
-CAR_ACCELERATION = 0.05
-CAR_BRAKE = 0.1
-CAR_REVERSE = 0.02
-CAR_FRICTION = 0.01
-
 #Propriétés des ROAD_TILES
 
-FRICTION_COEFFS = [0.9,0.4,0,0.1] #route, herbe, mur, glace
+FRICTION_COEFFS = [1.1 ,0.75,0,0.4] #route, herbe, mur, glace
 
 #Coefficients de la Magic Tire Equation
 PACEJKA_B_LONG = 10
@@ -47,10 +40,10 @@ STEERING_VELOCITY = [0.1,0.15] #Vitesse de rotation du volant, valeur sans unit�
 STEERING_RANGE = [0.8,1.1] #angle max de rotation des roues , RADIAN
 WHEEL_BASE = [4] #entraxe des roues longitudinal, METRE
 WHEEL_TRACK = [1.9] #entraxe des roues latéral, METRE
-MAX_ENGINE_TORQUE = [160] #couple max du moteur , N * m
+MAX_ENGINE_TORQUE = [180] #couple max du moteur , N * m
 CENTER_GRAVITY_Z = [0.3] #hauteur du CG en m
 CENTER_GRAVITY_X = [0.2] #position longitudinale du CG a partir du centre geométrique de la voiture (pos ou neg)
 MASS = [600]  #masse en kg
 CAR_WIDTH = [2] #m
 CAR_HEIGHT = [4.7]#m
-CAR_IZZ = [2000] #KG * m²
+CAR_IZZ = [1500] #KG * m²
