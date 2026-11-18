@@ -41,7 +41,7 @@ class GameModel:
         type_grid = convert_track(track_path)
 
         self.circuit_texture_render = load(texture_path(track_path)).convert_alpha()
-        self.circuit_texture_render = scale(self.circuit_texture_render, (WINDOW_WIDTH,WINDOW_HEIGHT)) #Changements importans ici pour choisir la bonne track 
+        self.circuit_texture_render = scale(self.circuit_texture_render, (WINDOW_WIDTH,WINDOW_HEIGHT)) #Changements importans ici pour choisir la bonne track
         grid = [[RoadTile(col=col_idx, row=row_idx, road_type=type_grid[row_idx][col_idx])for col_idx in range(GRID_COLS)] for row_idx in range(GRID_ROWS)]
         self.circuit = Circuit(grid=grid)
         self.spawn_car() # ici on modifie si on veut choisir le modele
@@ -54,7 +54,7 @@ class GameModel:
     def spawn_cubes(self) -> None:
         "Fait apparaitre les cubes sur la piste"
         self.items = [ItemBox(436,152), ItemBox(1302,418), ItemBox(910,698)]
-    
+
     def update(self, audio_controller=None) -> None:
         """ Fonction de mise à jour du jeu pendant la course """
 
