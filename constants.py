@@ -26,6 +26,9 @@ FRICTION_COEFFS = [0.9,0.4,0,0.1] #route, herbe, mur, glace
 PACEJKA_B_LONG = 10
 PACEJKA_C_LONG = 1.4
 PACEJKA_E_LONG = -1
+PACEJKA_B_LAT = 10
+PACEJKA_C_LAT = 1.3 #palier à environ 0.89 du pic
+PACEJKA_E_LAT = -2.2 #place le pic à un glissement d'environ 0.15, comme en longitudinal
 class GameState:
     MENU = "menu"
     RACING = "racing"
