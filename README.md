@@ -61,6 +61,12 @@ python main.py
 | Tourner à droite          | `D`                     | `→`             |
 | Action supplémentaire *(à préciser)* | `Espace`     | `Entrée`        |
 
+Dans les menus : `↑` / `↓` (ou `Z` / `S`) pour choisir, `Entrée` pour valider, `Échap` pour revenir. En course, `Échap` met le jeu en pause. `F11` passe en plein écran.
+
+## Ajouter un circuit
+
+Déposer la carte des terrains `xx_nom.png` dans `assets/tracks/` (et, si besoin, l'image affichée `xx_nom_texture.png`) : le circuit apparaît automatiquement dans l'écran de choix, sous le nom « Nom ».
+
 ## Structure du projet
 
 ```
@@ -72,6 +78,7 @@ python main.py
 │   ├── car.py               #   Voiture (position, vitesse, rotation)
 │   ├── circuit.py           #   Circuit (grille de tuiles)
 │   ├── game_model.py        #   État global de la partie
+│   ├── menu.py              #   Menus (classe abstraite Menu, menu principal, choix du circuit, pause)
 │   └── road_tile.py         #   Tuile de route
 ├── view/                    # VUE : affichage pygame
 │   └── game_view.py         #   Dessin du menu, du circuit et des voitures

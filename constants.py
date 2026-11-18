@@ -24,7 +24,11 @@ PACEJKA_C_LAT = 1.3 #palier à environ 0.89 du pic
 PACEJKA_E_LAT = -2.2 #place le pic à un glissement d'environ 0.15, comme en longitudinal
 class GameState:
     MENU = "menu"
+    TRACK_SELECT = "track_select"
+    LOADING = "loading"
     RACING = "racing"
+    PAUSE = "pause"
+    QUIT = "quit"
 
 
 # --- Couleurs UI ---
@@ -33,6 +37,7 @@ COLOR_TEXT = (240, 240, 240)
 COLOR_ACCENT = (255, 200, 0)
 COLOR_PANEL = (30, 30, 50)
 COLOR_PANEL_BORDER = (60, 60, 100)
+COLOR_HINT = (150, 150, 170)
 
 #Charactéristiques des voitures, placeholder pour le moment
 RWD = [1,0] #bool, true si propulsion, false si traction
