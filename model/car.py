@@ -165,11 +165,11 @@ class Car:
         for tire in self.list_tires:
             fx,fy = tire.compute_forces()
             if tire.offset_length>0:
-                fx_car += fx * math.cos(self.steering_angle) - fy*math.sin(self.steering_angle)
-                fy_car += fx * math.sin(self.steering_angle) + fy*math.cos(self.steering_angle)
+                fx_car = fx * math.cos(self.steering_angle) - fy*math.sin(self.steering_angle)
+                fy_car = fx * math.sin(self.steering_angle) + fy*math.cos(self.steering_angle)
             else :
-                fx_car += fx
-                fy_car += fy
+                fx_car = fx
+                fy_car = fy
 
             fx_tot += fx_car
             fy_tot +=fy_car
