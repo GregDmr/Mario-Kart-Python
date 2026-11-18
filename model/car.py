@@ -176,8 +176,10 @@ class Car:
 
             mom_tot += tire.offset_length * fy_car - tire.offset_width * fx_car
         fx_tot -= self.vx *abs(self.vx) * 0.5 + 0.3 * self.vx #friction du a l'air (vitesse carrée) et linéaire (vitesse lineaire)
-        ax=fx_tot/self.mass
-        ay = fy_tot/self.mass
+       
+        ax = fx_tot/self.mass + self.omegad*self.vy #le terme de rotation des vecteurs vitesse était oublié : la voiture pouvait garder sa vitesse vx dans les virages sans cout
+        ay = fy_tot/self.mass - self.omegad*self.vx
+
 
         omegadd = mom_tot/self.izz 
         return (ax,ay,omegadd)
