@@ -21,7 +21,7 @@ def convert_track(chosen_track_path : str) -> list[list[int]]:
 
     Returns:
         Matrice de GRID_ROWS lignes et GRID_COLS colonnes, accessible par
-        matrix[row][col]. IDs : 0 = route, 1 = herbe, 2 = mur, 3 = eau.
+        matrix[row][col]. IDs : 0 = route, 1 = herbe, 2 = mur, 3 = glace.
     """
     image = pygame.image.load(chosen_track_path) #doit etre 24 bits ou plus
     resized = pygame.transform.smoothscale(image, (GRID_COLS * TILE_SIZE, GRID_ROWS * TILE_SIZE))

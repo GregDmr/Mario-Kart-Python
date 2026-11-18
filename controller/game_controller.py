@@ -4,7 +4,7 @@ import constants as c
 from model.game_model import GameModel
 from view.game_view import GameView
 from controller.input_handler import InputHandler
-from controller.music_controller import MusicController
+from controller.audio_controller import AudioController
 
 UP_KEYS = (pygame.K_UP, pygame.K_z)  #Les deux joueurs peuvent naviguer dans les menus
 DOWN_KEYS = (pygame.K_DOWN, pygame.K_s)
@@ -20,7 +20,7 @@ class GameController:
         self.model = GameModel() # Instanciation de notre classe GameModel
         self.view = GameView(self.screen) # Connexion entre la partie graphique et la fenêtre de l'écran
         self.input_handler = InputHandler() # Initialisation du module pour gérer les entrées de  l'utilisateur
-        self.music_handler = MusicController(self.model) #Il faut passer le modele pour que le controle de la musique sache l'etat du jeu.
+        self.audio_handler = AudioController(self.model) #Il faut passer le modele pour que le controle de la musique sache l'etat du jeu.
         self.running = True # Booléen qui maintient la boucle du jeu active
 
     def run(self) -> None:
@@ -83,7 +83,7 @@ class GameController:
         p1_input = self.input_handler.get_inputs() # Récupération d'un dictionnaire comportant toutes les actions avec un booléen
         car = self.model.car # Récupération de l'instance de la voiture
         self.apply_input(car, p1_input) # Application du dictionnaire des inputs sur l'instance de la voiture
-        self.model.update() # Mise à jour du modèle
+        self.model.update(self.audio_handler) # Mise à jour du modèle
 
     def apply_input(self, car, player_input) -> None:
         """ Modification des paramètres internes de l'instance car avec les paramètres du dictionnaire player_input"""
@@ -104,4 +104,4 @@ class GameController:
         sys.exit() # Arrêt de l'interpréteur Python
 
     def music(self):
-        self.music_handler.update()
+        self.audio_handler.update_music()
