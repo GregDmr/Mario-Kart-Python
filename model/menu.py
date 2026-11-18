@@ -1,5 +1,25 @@
+import os
 from abc import ABC, abstractmethod
 from constants import GameState
+
+TRACKS_DIRECTORY = "assets/tracks"
+
+
+def texture_path(track_path: str):
+    """Image affichée d'un circuit : sa texture si elle existe, sinon la carte elle-même"""
+    texture = os.path.splitext(track_path)[0] + "_texture.png"  #"xx_nom.png" devient "xx_nom_texture.png"
+    if os.path.exists(texture):
+        return texture
+    return track_path
+
+
+def track_name(file_name: str):
+    """Nom affiché d'un circuit : "01_test_track.png" donne "Test track" """
+    name = os.path.splitext(file_name)[0]
+    number, _, rest = name.partition("_")
+    if number.isdigit() and rest:  #On retire le numéro d'ordre s'il y en a un
+        name = rest
+    return name.replace("_", " ").capitalize()
 
 
 class Menu(ABC):
@@ -25,6 +45,10 @@ class Menu(ABC):
     def back(self):
         """Action de la touche Echap """
 
+    def preview_path(self):
+        """Image d'aperçu de l'option sélectionnée, aucune par défaut"""
+        return None  #Seul TrackMenu la redéfinit
+
 
 class MainMenu(Menu):
     """Menu principal : jouer ou quitter (penser à rajouter une option keybinds si on veut rajouter la possibilité de choisir ses touches) """
@@ -36,9 +60,30 @@ class MainMenu(Menu):
 
     def select(self):
         if self.selected == 0:  #Option "Jouer"
-            self.game_model.start_race()
+            self.game_model.change_state(GameState.TRACK_SELECT)
         else:  #Option "Quitter" : le modèle ne ferme pas le jeu lui-même, il passe en QUIT et le contrôleur s'en charge
             self.game_model.change_state(GameState.QUIT)
 
     def back(self):
         self.game_model.change_state(GameState.QUIT)  #Echap dans le menu principal quitte le jeu
+
+
+class TrackMenu(Menu):
+    """Choix du circuit parmi les cartes du dossier des circuits"""
+
+    title = "Choix du circuit"
+
+    def __init__(self, game_model):
+        names = sorted(n for n in os.listdir(TRACKS_DIRECTORY)
+                       if n.lower().endswith(".png") and not n.lower().endswith("_texture.png"))  #On garde les cartes, pas les textures
+        self.tracks = [os.path.join(TRACKS_DIRECTORY, n) for n in names]
+        super().__init__(game_model, [track_name(n) for n in names])
+
+    def select(self):
+        self.game_model.start_race(self.tracks[self.selected])
+
+    def back(self):
+        self.game_model.change_state(GameState.MENU)
+
+    def preview_path(self):
+        return texture_path(self.tracks[self.selected])

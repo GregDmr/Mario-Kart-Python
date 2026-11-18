@@ -7,6 +7,8 @@ from constants import (
 from model.game_model import GameModel
 from model.menu import Menu
 
+MAX_VISIBLE_OPTIONS = 6  #Au-delà, la liste défile
+
 
 class GameView:
 
@@ -15,6 +17,8 @@ class GameView:
         self.font = pygame.font.SysFont("Arial", 24)
         self.title_font = pygame.font.SysFont("Arial", 56, bold=True)  #Police du titre des menus
         self.hint_font = pygame.font.SysFont("Arial", 18)  #Police du rappel des touches
+        self.name_font = pygame.font.SysFont("Arial", 36, bold=True)  #Police du nom sous l'aperçu
+        self.previews: dict[str, pygame.Surface] = {}  #Miniatures déjà calculées, pour ne pas recharger l'image à chaque frame
 
     def draw(self, model: GameModel) -> None:
         self.screen.fill(COLOR_BG)
@@ -26,22 +30,53 @@ class GameView:
         pygame.display.flip()
 
     def _draw_menu(self, menu: Menu):
-        """Dessine n'importe quel menu : titre, options et rappel des touches"""
-        title = self.title_font.render(menu.title, True, COLOR_ACCENT)  #Le titre dépend du menu (chaque sous-classe a le sien)
-        self.screen.blit(title, title.get_rect(center=(WINDOW_WIDTH // 2, 140)))  #Centré horizontalement, en haut de l'écran
+        """Dessine n'importe quel menu : titre, options, aperçu éventuel et rappel des touches"""
+        preview = menu.preview_path()
+        cx = WINDOW_WIDTH * 3 // 10 if preview else WINDOW_WIDTH // 2  #Avec un aperçu, la liste passe à gauche
 
-        for i, label in enumerate(menu.options):  #enumerate donne l'indice i en plus du texte, pour savoir si c'est l'option sélectionnée
-            rect = pygame.Rect(0, 0, 320, 56)  #Taille du bouton, la position est donnée juste après
-            rect.center = (WINDOW_WIDTH // 2, 340 + i * 80)  #Chaque bouton est 80 px sous le précédent
+        title = self.title_font.render(menu.title, True, COLOR_ACCENT)  #Le titre dépend du menu (chaque sous-classe a le sien)
+        self.screen.blit(title, title.get_rect(center=(WINDOW_WIDTH // 2, 140)))
+
+        first = max(0, min(menu.selected - MAX_VISIBLE_OPTIONS // 2, len(menu.options) - MAX_VISIBLE_OPTIONS))  #Première option affichée : la liste défile pour garder la sélection à l'écran
+        visible = menu.options[first:first + MAX_VISIBLE_OPTIONS]
+        for i, label in enumerate(visible, start=first):  #enumerate donne l'indice i en plus du texte, pour savoir si c'est l'option sélectionnée
+            rect = pygame.Rect(0, 0, 320, 56)
+            rect.center = (cx, 280 + (i - first) * 72)
             is_selected = i == menu.selected
-            pygame.draw.rect(self.screen, COLOR_PANEL, rect, border_radius=8)  #Fond du bouton
-            border = COLOR_ACCENT if is_selected else COLOR_PANEL_BORDER  #Bordure colorée seulement sur l'option sélectionnée
+            pygame.draw.rect(self.screen, COLOR_PANEL, rect, border_radius=8)
+            border = COLOR_ACCENT if is_selected else COLOR_PANEL_BORDER
             pygame.draw.rect(self.screen, border, rect, 3 if is_selected else 2, border_radius=8)  #Avec une épaisseur, draw.rect ne trace que le contour
             text = self.font.render(label, True, COLOR_ACCENT if is_selected else COLOR_TEXT)
-            self.screen.blit(text, text.get_rect(center=rect.center))  #Texte centré dans son bouton
+            self.screen.blit(text, text.get_rect(center=rect.center))
 
-        hint = self.hint_font.render("↑ ↓ : choisir    Entrée : valider    Echap : retour", True, COLOR_HINT)  #Rappel des touches
-        self.screen.blit(hint, hint.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT - 40)))  #En bas de l'écran
+        if first > 0:  #Flèches : il reste des options cachées au-dessus ou en dessous
+            pygame.draw.polygon(self.screen, COLOR_HINT, [(cx, 222), (cx - 14, 238), (cx + 14, 238)])
+        if first + MAX_VISIBLE_OPTIONS < len(menu.options):
+            pygame.draw.polygon(self.screen, COLOR_HINT, [(cx, 698), (cx - 14, 682), (cx + 14, 682)])
+
+        if preview:
+            self._draw_preview_panel(preview, menu.options[menu.selected])
+
+        hint = self.hint_font.render("↑ ↓ : choisir    Entrée : valider    Echap : retour", True, COLOR_HINT)
+        self.screen.blit(hint, hint.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT - 40)))
+
+    def _draw_preview_panel(self, image_path: str, name: str):
+        """Encadré à droite : miniature de l'image et nom de l'option sélectionnée"""
+        panel = pygame.Rect(0, 0, 620, 440)
+        panel.center = (WINDOW_WIDTH * 2 // 3, 450)
+        pygame.draw.rect(self.screen, COLOR_PANEL, panel, border_radius=12)
+        pygame.draw.rect(self.screen, COLOR_PANEL_BORDER, panel, 2, border_radius=12)
+
+        if image_path not in self.previews:  #Chargement et réduction une seule fois par image
+            image = pygame.image.load(image_path).convert_alpha()
+            self.previews[image_path] = pygame.transform.smoothscale(image, (560, 317))  #Même proportion que la fenêtre
+        preview = self.previews[image_path]
+        rect = preview.get_rect(midtop=(panel.centerx, panel.top + 30))
+        self.screen.blit(preview, rect)
+        pygame.draw.rect(self.screen, COLOR_PANEL_BORDER, rect.inflate(6, 6), 3)
+
+        name_text = self.name_font.render(name, True, COLOR_TEXT)
+        self.screen.blit(name_text, name_text.get_rect(center=(panel.centerx, rect.bottom + 45)))
 
     def _draw_racing(self, model: GameModel) -> None:
 

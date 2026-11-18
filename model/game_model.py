@@ -2,7 +2,7 @@ from constants import GameState, GRID_ROWS, GRID_COLS,WINDOW_HEIGHT,WINDOW_WIDTH
 from model.car import Car
 from model.circuit import Circuit
 from model.road_tile import RoadTile
-from model.menu import Menu, MainMenu
+from model.menu import Menu, MainMenu, TrackMenu, texture_path
 from tools.track_converter import convert_track
 from pygame.image import load
 from pygame.transform import scale
@@ -20,6 +20,7 @@ class GameModel:
         # Un menu par état qui en a un
         self.menus: dict[str, Menu] = {
             GameState.MENU: MainMenu(self),
+            GameState.TRACK_SELECT: TrackMenu(self),
         }
 
     def current_menu(self):
@@ -30,16 +31,16 @@ class GameModel:
         """Change d'écran """
         self.state = new_state
 
-    def start_race(self):
-        """Charge le circuit et lance la course """
-        self.load_circuit()
+    def start_race(self, track_path: str):
+        """Charge le circuit choisi et lance la course"""
+        self.load_circuit(track_path)
         self.change_state(GameState.RACING)
 
-    def load_circuit(self) -> None:
+    def load_circuit(self, track_path: str) -> None:
         """ Charge et génère le circuit ainsi que les voitures """
-        type_grid = convert_track("assets/tracks/01_test_track.png") # a modifier pour permettre choix des circuits
+        type_grid = convert_track(track_path)
 
-        self.circuit_texture_render = load("assets/tracks/01_test_track_texture.png").convert_alpha()
+        self.circuit_texture_render = load(texture_path(track_path)).convert_alpha()
         self.circuit_texture_render = scale(self.circuit_texture_render, (WINDOW_WIDTH,WINDOW_HEIGHT)) #Changements importans ici pour choisir la bonne track 
         grid = [[RoadTile(col=col_idx, row=row_idx, road_type=type_grid[row_idx][col_idx])for col_idx in range(GRID_COLS)] for row_idx in range(GRID_ROWS)]
         self.circuit = Circuit(grid=grid)

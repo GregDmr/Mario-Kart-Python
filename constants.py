@@ -24,6 +24,7 @@ PACEJKA_C_LAT = 1.3 #palier à environ 0.89 du pic
 PACEJKA_E_LAT = -2.2 #place le pic à un glissement d'environ 0.15, comme en longitudinal
 class GameState:
     MENU = "menu"
+    TRACK_SELECT = "track_select"
     RACING = "racing"
     QUIT = "quit"
 
