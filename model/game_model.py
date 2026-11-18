@@ -2,7 +2,7 @@ from constants import GameState, GRID_ROWS, GRID_COLS,WINDOW_HEIGHT,WINDOW_WIDTH
 from model.car import Car
 from model.circuit import Circuit
 from model.road_tile import RoadTile
-from model.menu import Menu, MainMenu, TrackMenu, texture_path
+from model.menu import Menu, MainMenu, TrackMenu, PauseMenu, texture_path
 from tools.track_converter import convert_track
 from pygame.image import load
 from pygame.transform import scale
@@ -21,6 +21,7 @@ class GameModel:
         self.menus: dict[str, Menu] = {
             GameState.MENU: MainMenu(self),
             GameState.TRACK_SELECT: TrackMenu(self),
+            GameState.PAUSE: PauseMenu(self),
         }
 
     def current_menu(self):
@@ -30,6 +31,8 @@ class GameModel:
     def change_state(self, new_state: str):
         """Change d'écran """
         self.state = new_state
+        if new_state == GameState.PAUSE:  #La pause s'ouvre toujours sur "Reprendre"
+            self.menus[GameState.PAUSE].selected = 0
 
     def start_race(self, track_path: str):
         """Charge le circuit choisi et lance la course"""

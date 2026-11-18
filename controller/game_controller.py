@@ -58,6 +58,8 @@ class GameController:
         menu = self.model.current_menu()
         if menu is not None:  #Si on est dans un menu
             self.handle_menu_key(menu, key)
+        elif self.model.state == c.GameState.RACING and key == pygame.K_ESCAPE:  #Pas de menu en course : Echap ouvre la pause
+            self.model.change_state(c.GameState.PAUSE)
 
         if self.model.state == c.GameState.QUIT:  #Le menu a demandé à quitter : c'est le contrôleur qui arrête le jeu
             self.quit()

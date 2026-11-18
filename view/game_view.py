@@ -22,26 +22,37 @@ class GameView:
 
     def draw(self, model: GameModel) -> None:
         self.screen.fill(COLOR_BG)
-        if model.state == GameState.RACING:
+        if model.state in (GameState.RACING, GameState.PAUSE):  #En pause, la course reste affichée, figée
             self._draw_racing(model)
         menu = model.current_menu()
-        if menu is not None:  #Si on est dans un menu (peu importe lequel)
+        if model.state == GameState.PAUSE:
+            self._draw_veil()
+            self._draw_menu(menu, panel=True)
+        elif menu is not None:  #Si on est dans un menu (peu importe lequel)
             self._draw_menu(menu)
         pygame.display.flip()
 
-    def _draw_menu(self, menu: Menu):
+    def _draw_menu(self, menu: Menu, panel: bool = False):
         """Dessine n'importe quel menu : titre, options, aperçu éventuel et rappel des touches"""
         preview = menu.preview_path()
         cx = WINDOW_WIDTH * 3 // 10 if preview else WINDOW_WIDTH // 2  #Avec un aperçu, la liste passe à gauche
+        title_y, first_y = 140, 280
+
+        if panel:  #Menu dans un encadré au centre de l'écran (pause)
+            box = pygame.Rect(0, 0, 420, 320)
+            box.center = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
+            pygame.draw.rect(self.screen, COLOR_BG, box, border_radius=12)
+            pygame.draw.rect(self.screen, COLOR_PANEL_BORDER, box, 2, border_radius=12)
+            title_y, first_y = box.top + 70, box.top + 170
 
         title = self.title_font.render(menu.title, True, COLOR_ACCENT)  #Le titre dépend du menu (chaque sous-classe a le sien)
-        self.screen.blit(title, title.get_rect(center=(WINDOW_WIDTH // 2, 140)))
+        self.screen.blit(title, title.get_rect(center=(WINDOW_WIDTH // 2, title_y)))
 
         first = max(0, min(menu.selected - MAX_VISIBLE_OPTIONS // 2, len(menu.options) - MAX_VISIBLE_OPTIONS))  #Première option affichée : la liste défile pour garder la sélection à l'écran
         visible = menu.options[first:first + MAX_VISIBLE_OPTIONS]
         for i, label in enumerate(visible, start=first):  #enumerate donne l'indice i en plus du texte, pour savoir si c'est l'option sélectionnée
             rect = pygame.Rect(0, 0, 320, 56)
-            rect.center = (cx, 280 + (i - first) * 72)
+            rect.center = (cx, first_y + (i - first) * 72)
             is_selected = i == menu.selected
             pygame.draw.rect(self.screen, COLOR_PANEL, rect, border_radius=8)
             border = COLOR_ACCENT if is_selected else COLOR_PANEL_BORDER
@@ -50,15 +61,21 @@ class GameView:
             self.screen.blit(text, text.get_rect(center=rect.center))
 
         if first > 0:  #Flèches : il reste des options cachées au-dessus ou en dessous
-            pygame.draw.polygon(self.screen, COLOR_HINT, [(cx, 222), (cx - 14, 238), (cx + 14, 238)])
+            pygame.draw.polygon(self.screen, COLOR_HINT, [(cx, first_y - 58), (cx - 14, first_y - 42), (cx + 14, first_y - 42)])
         if first + MAX_VISIBLE_OPTIONS < len(menu.options):
-            pygame.draw.polygon(self.screen, COLOR_HINT, [(cx, 698), (cx - 14, 682), (cx + 14, 682)])
+            pygame.draw.polygon(self.screen, COLOR_HINT, [(cx, first_y + 418), (cx - 14, first_y + 402), (cx + 14, first_y + 402)])
 
         if preview:
             self._draw_preview_panel(preview, menu.options[menu.selected])
 
         hint = self.hint_font.render("↑ ↓ : choisir    Entrée : valider    Echap : retour", True, COLOR_HINT)
         self.screen.blit(hint, hint.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT - 40)))
+
+    def _draw_veil(self):
+        """Voile sombre semi-transparent sur tout l'écran"""
+        veil = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.SRCALPHA)  #SRCALPHA : surface qui gère la transparence
+        veil.fill((0, 0, 0, 160))  #4e valeur : opacité, de 0 (invisible) à 255 (opaque)
+        self.screen.blit(veil, (0, 0))
 
     def _draw_preview_panel(self, image_path: str, name: str):
         """Encadré à droite : miniature de l'image et nom de l'option sélectionnée"""

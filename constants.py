@@ -26,6 +26,7 @@ class GameState:
     MENU = "menu"
     TRACK_SELECT = "track_select"
     RACING = "racing"
+    PAUSE = "pause"
     QUIT = "quit"
 
 
