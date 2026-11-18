@@ -159,17 +159,29 @@ class Car:
         omegadd =0
         fx_tot =0
         fy_tot=0
+        fx_car = 0
+        fy_car = 0
         mom_tot = 0
         for tire in self.list_tires:
             fx,fy = tire.compute_forces()
-            fx_tot+= fx
-            fy_tot+= fy
-            mom_tot += tire.offset_length * fy - tire.offset_width * fx
-        fx_tot -= self.vx *abs(self.vx) * 0.5 + 0.3 * self.vx 
-        ax=fx_tot/self.mass
-        ay = fy_tot/self.mass
+            if tire.offset_length>0:
+                fx_car = fx * math.cos(self.steering_angle) - fy*math.sin(self.steering_angle)
+                fy_car = fx * math.sin(self.steering_angle) + fy*math.cos(self.steering_angle)
+            else :
+                fx_car = fx
+                fy_car = fy
 
-        #omegadd = mom_tot/self.izz POUR PLUS TARD
+            fx_tot += fx_car
+            fy_tot +=fy_car
+
+            mom_tot += tire.offset_length * fy_car - tire.offset_width * fx_car
+        fx_tot -= self.vx *abs(self.vx) * 0.5 + 0.3 * self.vx #friction du a l'air (vitesse carrée) et linéaire (vitesse lineaire)
+       
+        ax = fx_tot/self.mass + self.omegad*self.vy #le terme de rotation des vecteurs vitesse était oublié : la voiture pouvait garder sa vitesse vx dans les virages sans cout
+        ay = fy_tot/self.mass - self.omegad*self.vx
+
+
+        omegadd = mom_tot/self.izz 
         return (ax,ay,omegadd)
 
     def compute_speeds(self,accels) -> float:
@@ -177,10 +189,10 @@ class Car:
         dt = 1 / c.FPS
         self.vx += accels[0] * dt #m/s
         self.vy += accels[1] * dt #m/s
-        self.omegad = self.steering_angle *3
+        self.omegad += accels[2] *dt #rad/s
         if abs(self.vx) < 0.05 and self.desired_torque == 0:
             self.vx = 0
-        #self.omegad += accels[2] * dt #rad/s POUR PLUS TARD
+       
 
     def engine_behavior(self, tire_speed):
         """Sert a plafonner la vitesse du moteur (le couple), retourne un multiplicateur pour le couple moteur"""

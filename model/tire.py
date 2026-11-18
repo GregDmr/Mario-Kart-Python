@@ -16,6 +16,7 @@ class Tire :
         self.rot_speed_tire = 0.0
         self.rot_speed_car = 0.0
         self.inertia = 1.2
+
     def compute_forces(self):
 
         tile = self.get_tile()
@@ -25,13 +26,15 @@ class Tire :
             friction_coef = c.FRICTION_COEFFS[1]
         self.compute_Fz()
 
-        self.compute_rot_speed_car() 
+        self.contact_point_vel() 
 
-        Fx = self.magic_tire_formula(friction_coef, self.Fz)
+        sx,sy,s_combined = self.compute_slips()
 
+        Fx = self.magic_tire_formulaLONGI(friction_coef, self.Fz, sx, sy, s_combined)
+        Fy = self.magic_tire_formulaLATE(friction_coef, self.Fz, sx, sy, s_combined)
         self.compute_rot_speed_tire(Fx)
                         
-        Fy = 0
+        
         
         return (Fx,Fy)
 
@@ -71,15 +74,44 @@ class Tire :
             else:
                 self.rot_speed_tire += brake_step #le freinage ne peut que s'opposer a la vitesse de la roue.
             
-    def compute_rot_speed_car(self):
-        self.rot_speed_car = self.car.vx/self.tire_radius
+    def contact_point_vel(self):
+        self.vcx = self.car.vx + self.car.omegad * -self.offset_width
+        self.vcy = self.car.vy + self.car.omegad * self.offset_length
 
-    def magic_tire_formula(self,friction, Fz):
-        """Force longitudinale (formule de Pacejka) selon le taux de glissement"""
-        slip_ratio = (self.rot_speed_tire - self.rot_speed_car) * self.tire_radius / max(abs(self.car.vx), 1) #max pour éviter la division par 0 à l'arrêt
-        bx = c.PACEJKA_B_LONG * slip_ratio
+
+    def magic_tire_formulaLONGI(self,friction, Fz,sx,sy,s_combined): #sy pas utilisé mais c'est pour que les calls soient identique plus haut, idemm pour late
+        """Force longitudinale (formule de Pacejka) selon le glissement combiné, projetée sur l'axe x"""
+        if s_combined < 1e-6: #évite la division par 0 quand il n'y a aucun glissement
+            return 0
+        bx = c.PACEJKA_B_LONG * s_combined
         inner = bx - c.PACEJKA_E_LONG * (bx - math.atan(bx))
-        return friction * Fz * math.sin(c.PACEJKA_C_LONG * math.atan(inner)) #Formule magique du pneu, extrait de TireModelingReader 2023 (Igo Besselink, université d'Eindhoven)
-    
+        F = friction * Fz * math.sin(c.PACEJKA_C_LONG * math.atan(inner)) #Formule magique du pneu, extrait de TireModelingReader 2023 (Igo Besselink, université d'Eindhoven)
+        return F * sx / s_combined #part de la force sur l'axe x
+
+    def magic_tire_formulaLATE(self,friction, Fz,sx,sy,s_combined):
+        """Force latérale (formule de Pacejka) selon le glissement combiné, projetée sur l'axe y"""
+        if s_combined < 1e-6:
+            return 0
+        by = c.PACEJKA_B_LAT * s_combined
+        inner = by - c.PACEJKA_E_LAT * (by - math.atan(by))
+        F = friction * Fz * math.sin(c.PACEJKA_C_LAT * math.atan(inner))
+        return -F * sy / s_combined #il y a un moins car la vitesse late de la roue est toujrous nulel donc le slip fait -v_late - a opposers
+
     def compute_Fz(self): #POUR PLUS TARD
-        self.Fz = self.Fz
+        self.Fz = self.Fz  
+
+    def compute_slips(self) :
+
+        if self.offset_length>0: #seulement si ce sont les pneus qui sont devant
+            v_longi = self.vcx * math.cos(self.car.steering_angle) + self.vcy * math.sin(self.car.steering_angle)
+            v_late = -self.vcx * math.sin(self.car.steering_angle) + self.vcy * math.cos(self.car.steering_angle) #Vitesses a convertir dans le referentiel du pneu
+        else :
+            v_longi = self.vcx
+            v_late = self.vcy
+
+        #vitesses du point de contact du pneu dans le ref de la voiture obtenues -> QUID du pneu lui meme ? Il tourne ou pas ?
+        v_ref = max(1,abs(v_longi)) #vitesse qui permet d'avoir un slip RATIO (dérapage a 1m/s plus violent en roulant a 20 kmh que a 120 kmh)
+        slip_longi = (self.rot_speed_tire * self.tire_radius -v_longi)/v_ref
+        slip_late = math.atan(v_late/v_ref)
+        combined_slip = math.sqrt(slip_longi**2 + slip_late**2)
+        return slip_longi, slip_late, combined_slip
