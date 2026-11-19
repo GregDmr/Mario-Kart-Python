@@ -46,6 +46,13 @@ class GameView:
         
         if model.circuit is None:
             return
+        #affichage des tire marks, avant la voiture pour qu'elles soient dessous
+        for tire_mark in model.car.tire_mark_list:
+            sprite, rect = tire_mark.mark_sprite()
+            alpha = max(0, 255 * tire_mark.lifespan // tire_mark.lifespan_init) #255 = opaque, 0 = invisible
+            sprite.set_alpha(alpha)
+            self.screen.blit(sprite, rect)
+
         surf, rect = model.car.get_rotated_sprite() # a faire pour chaque voiture eventuellement
         self.screen.blit(surf, rect)
         surf_texte = model.car.debug_variables(self.font)
@@ -54,7 +61,7 @@ class GameView:
         # Affichage des items sur la piste (cubes, bananes, etc)
         for item in model.items:
             item.draw(self.screen)
-        
+
         # Affichage des coordonnées de la souris en temps réel (Debug)
         mx, my = pygame.mouse.get_pos()
         mouse_surf = self.font.render(f"Souris: ({mx}, {my})", True, (255, 255, 0))

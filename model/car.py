@@ -25,7 +25,6 @@ class Car:
         self.steering_velocity = c.STEERING_VELOCITY[chosen_car]
         self.steering_range = c.STEERING_RANGE[chosen_car]
         self.max_torque = c.MAX_ENGINE_TORQUE[chosen_car]
-        
         self.braking_torque = 300 #attention meme ordre de grandeur que engine torque (plus grand car freinage, mais le calcul pour la force est le meme)
         self.izz = c.CAR_IZZ[chosen_car]
         propulsion = c.RWD[chosen_car]
@@ -47,7 +46,7 @@ class Car:
         self.angle : float =0.0
         # Génération du sprite visuel de base 
         self.sprite = self.build_sprite(chosen_car)
-
+        self.tire_mark_list = []
         #Pneus
         front_offset = self.wheelbase/2-self.center_grav_x
         rear_offset = (self.wheelbase/2+self.center_grav_x)*-1
@@ -146,6 +145,7 @@ class Car:
                     
     def update_position(self) -> None:
         """ Met à jour la position de la voiture en fonction de sa vitesse"""
+        self.tire_mark_list = [m for m in self.tire_mark_list if m.lifespan > 0] #itere dans la liste, mais ne valide pas la classe si lifespan =0 ou moins
         self.compute_speeds(self.compute_accelerations())
         dt = 1 / c.FPS
         self.angle += math.degrees(self.omegad) * dt #omega en rad/s, l'angle reste en degrés
@@ -165,7 +165,7 @@ class Car:
         fy_car = 0
         mom_tot = 0
         for tire in self.list_tires:
-            fx,fy = tire.compute_forces()
+            fx,fy,tire_mark = tire.compute_forces()
             if tire.offset_length>0:
                 fx_car = fx * math.cos(self.steering_angle) - fy*math.sin(self.steering_angle)
                 fy_car = fx * math.sin(self.steering_angle) + fy*math.cos(self.steering_angle)
@@ -173,6 +173,8 @@ class Car:
                 fx_car = fx
                 fy_car = fy
 
+            if tire_mark is not None : 
+                self.render_tire_mark(tire_mark) # dans compute acceleration puisque le derapage du pneu est directement lié
             fx_tot += fx_car
             fy_tot +=fy_car
 
@@ -266,4 +268,7 @@ class Car:
     def debug_variables(self,font) -> pygame.Surface:
         #FOR DEBUGGING TO REMOVE LATER ON
         surf_text = font.render(f"vx: {self.vx:.2f}  vy: {self.vy:.2f}  angle: {self.angle:.1f}  desired_torque: {self.desired_torque:.2f}  steering: {self.steering_angle:.3f}", True, (255, 255, 255))
-        return surf_text
+        return surf_text    
+
+    def render_tire_mark(self,tire_mark):
+        self.tire_mark_list.append(tire_mark)

@@ -2,6 +2,7 @@ import math
 import constants as c
 from constants import PIXEL_PER_METER as ppm
 from tools.degree_trig import sind, cosd
+from model.tire_mark import TireMark
 
 class Tire :
 
@@ -18,7 +19,7 @@ class Tire :
         self.inertia = 1.2
         self.def_x = 0.0 #déformation du patch de contact (m), gardée d'une frame à l'autre
         self.def_y = 0.0
-
+        self.last_mark_gen = (0,0)
     def compute_forces(self):
 
         tile = self.get_tile()
@@ -31,14 +32,29 @@ class Tire :
         self.contact_point_vel() 
 
         sx,sy,s_combined = self.compute_slips()
-
+        tire_mark = self.generate_mark(s_combined)
+        
         Fx = self.magic_tire_formulaLONGI(friction_coef, self.Fz, sx, sy, s_combined)
         Fy = self.magic_tire_formulaLATE(friction_coef, self.Fz, sx, sy, s_combined)
         self.compute_rot_speed_tire(Fx)
                         
         
         
-        return (Fx,Fy)
+        return (Fx,Fy, tire_mark)
+
+
+    def generate_mark(self,current_slip):
+        
+        pos_x = self.car.x + ppm*self.offset_width*cosd(self.car.angle) + ppm*self.offset_length*sind(self.car.angle)
+        pos_y = self.car.y - ppm*self.offset_width*sind(self.car.angle) + ppm*self.offset_length*cosd(self.car.angle)
+        dist_to_last = math.sqrt((self.last_mark_gen[0]-pos_x)**2 + (self.last_mark_gen[1] - pos_y)**2)
+        if dist_to_last>=2 and current_slip> 0.15:
+            self.last_mark_gen = (pos_x,pos_y)
+            return TireMark(pos_x,pos_y,400)
+        else:
+            return None
+            
+        
 
     def get_tile(self):
         """Retourne un objet RoadTile pour le pneu contenant les attributs nécéssaires"""
