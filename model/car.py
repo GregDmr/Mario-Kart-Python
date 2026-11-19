@@ -7,8 +7,9 @@ from model.tire import Tire
 from tools.degree_trig import sind, cosd
 from model.circuit import Circuit
 class Car:
+    """Voiture : physique, pneus, traces de pneus et sprite."""
 
-    def __init__(self, circuit :Circuit, start_col: int, start_row: int, chosen_car : int =0):
+    def __init__(self, circuit :Circuit, start_col: int, start_row: int, chosen_car : int =0, start_angle: float = 0.0):
         """ Initialise une voiture à partir de sa position sur la grille """
         #circuit a passer au pneu
         self.circuit = circuit
@@ -38,12 +39,11 @@ class Car:
         self.vx: float = 0.0
         self.vy: float = 0.0
         self.omegad :float = 0.0
-        self.angle: float = 0.0
+        self.angle: float = start_angle #degrés
         self.steering_multiplier : float = 0.0 #entre -1 et 1
         self.steering_angle : float = 0.0 #radians
         self.torque_multiplier : float = 0.0 #entre -1 et 1
         self.desired_torque : float = 0.0 #N.m
-        self.angle : float =0.0
         # Génération du sprite visuel de base 
         self.sprite = self.build_sprite(chosen_car)
         self.tire_mark_list = []
@@ -216,14 +216,8 @@ class Car:
     
     def build_sprite(self, chosen_car) -> pygame.Surface:
         """ Construit et retourne la surface graphique (sprite) de la voiture """
-        
-        directory = "assets/sprites/cars"
-        files = []
-        for name in sorted(os.listdir(directory)):
-            if name.endswith(".png"):
-                path = os.path.join(directory, name)
-                files.append(path)
-        chosen_sprite = pygame.image.load(files[chosen_car]).convert_alpha() #sprite a la bonne taille
+        path = os.path.join(c.CAR_SPRITES_DIRECTORY, c.CAR_SPRITE[chosen_car])
+        chosen_sprite = pygame.image.load(path).convert_alpha() #sprite a la bonne taille
         chosen_sprite = pygame.transform.scale(chosen_sprite,(self.car_width*ppm,self.car_height*ppm))
 
         #surface un peu plus grande que la voiture, pour que les roues puissent dépasser de la carrosserie

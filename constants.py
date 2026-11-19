@@ -1,3 +1,5 @@
+import pygame
+
 FPS = 60
 
 TILE_SIZE = 1
@@ -48,14 +50,24 @@ COLOR_HINT = (150, 150, 170)
 RWD = [1,0] #bool, true si propulsion, false si traction
 STEERING_VELOCITY = [0.1,0.15] #Vitesse de rotation du volant, valeur sans unité
 STEERING_RANGE = [0.8,1.1] #angle max de rotation des roues , RADIAN
-WHEEL_BASE = [4] #entraxe des roues longitudinal, METRE
-WHEEL_TRACK = [1.9] #entraxe des roues latéral, METRE
-MAX_ENGINE_TORQUE = [180] #couple max du moteur , N * m
-CENTER_GRAVITY_Z = [0.3] #hauteur du CG en m
-CENTER_GRAVITY_X = [0.2] #position longitudinale du CG a partir du centre geométrique de la voiture (pos ou neg)
-MASS = [600]  #masse en kg
-CAR_WIDTH = [2] #m
-CAR_HEIGHT = [4.7]#m
-WHEEL_LENGTH = [0.6] #m, taille de la roue vue de dessus, dans le sens de roulage
-WHEEL_WIDTH = [0.3] #m
-CAR_IZZ = [800] #KG * m²
+WHEEL_BASE = [4,4] #entraxe des roues longitudinal, METRE
+WHEEL_TRACK = [1.9,1.9] #entraxe des roues latéral, METRE
+MAX_ENGINE_TORQUE = [180,180] #couple max du moteur , N * m
+CENTER_GRAVITY_Z = [0.3,0.3] #hauteur du CG en m
+CENTER_GRAVITY_X = [0.2,0.2] #position longitudinale du CG a partir du centre geométrique de la voiture (pos ou neg)
+MASS = [600,600]  #masse en kg
+CAR_WIDTH = [2,2] #m
+CAR_HEIGHT = [4.7,4.7]#m
+WHEEL_LENGTH = [0.6,0.6] #m, taille de la roue vue de dessus, dans le sens de roulage
+WHEEL_WIDTH = [0.3,0.3] #m
+CAR_IZZ = [800,800] #KG * m²
+CAR_SPRITE = ["01_yellow_test.png", "01_yellow_test.png"]
+CAR_SPRITES_DIRECTORY = "assets/sprites/cars"
+
+#Touches par défaut de chaque joueur (action -> touches)
+DEFAULT_KEYBINDS = [
+    {"accelerate": [pygame.K_z, pygame.K_w], "decelerate": [pygame.K_s],
+     "turn_left": [pygame.K_q, pygame.K_a], "turn_right": [pygame.K_d], "use_item": [pygame.K_SPACE]},
+    {"accelerate": [pygame.K_UP], "decelerate": [pygame.K_DOWN],
+     "turn_left": [pygame.K_LEFT], "turn_right": [pygame.K_RIGHT], "use_item": [pygame.K_RETURN]},
+]

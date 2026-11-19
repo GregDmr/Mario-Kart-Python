@@ -19,7 +19,7 @@ class GameController:
         self.clock = pygame.time.Clock() # Initialisation de l'horloge interne du jeu
         self.model = GameModel() # Instanciation de notre classe GameModel
         self.view = GameView(self.screen) # Connexion entre la partie graphique et la fenêtre de l'écran
-        self.input_handler = InputHandler() # Initialisation du module pour gérer les entrées de  l'utilisateur
+        self.input_handlers = [InputHandler(keybinds) for keybinds in self.model.keybinds] # Initialisation du module pour gérer les entrées de  l'utilisateur
         self.audio_handler = AudioController(self.model) #Il faut passer le modele pour que le controle de la musique sache l'etat du jeu.
         self.running = True # Booléen qui maintient la boucle du jeu active
 
@@ -60,6 +60,10 @@ class GameController:
             self.handle_menu_key(menu, key)
         elif self.model.state == c.GameState.RACING and key == pygame.K_ESCAPE:  #Pas de menu en course : Echap ouvre la pause
             self.model.change_state(c.GameState.PAUSE)
+        elif self.model.state == c.GameState.RACING:
+            for index, handler in enumerate(self.input_handlers):
+                if handler.is_item_key(key):
+                    self.model.use_item(index)
 
         if self.model.state == c.GameState.LOADING:  #Un circuit vient d'être choisi
             self.render()  #On affiche l'écran de chargement avant de charger, sinon il n'apparaîtrait jamais
@@ -86,9 +90,9 @@ class GameController:
         if self.model.state != c.GameState.RACING:
             return
 
-        p1_input = self.input_handler.get_inputs() # Récupération d'un dictionnaire comportant toutes les actions avec un booléen
-        car = self.model.car # Récupération de l'instance de la voiture
-        self.apply_input(car, p1_input) # Application du dictionnaire des inputs sur l'instance de la voiture
+        for player, handler in zip(self.model.players, self.input_handlers):
+            player_input = handler.get_inputs() # Récupération d'un dictionnaire comportant toutes les actions avec un booléen
+            self.apply_input(player.car, player_input) # Application du dictionnaire des inputs sur l'instance de la voiture
         self.model.update(self.audio_handler) # Mise à jour du modèle
 
     def apply_input(self, car, player_input) -> None:
