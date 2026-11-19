@@ -19,7 +19,7 @@ class ItemBox:
         raw_image_itembox = pygame.image.load("assets/items/sprite_cube.png").convert_alpha()
         self.image_itembox = pygame.transform.scale(raw_image_itembox, (size, size))
 
-    def collision(self, car, audio_controller=None) -> None:
+    def collision(self, player, audio_controller=None) -> None:
         """ Gère la collision avec le kart """
         # Cube déjà récupéré
         if not self.is_active:
