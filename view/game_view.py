@@ -128,7 +128,8 @@ class GameView:
             alpha = max(0, 255 * tire_mark.lifespan // tire_mark.lifespan_init) #255 = opaque, 0 = invisible
             sprite.set_alpha(alpha)
             self.screen.blit(sprite, rect)
-
+            if model.state != GameState.PAUSE:
+                tire_mark.lifespan_decount()
         surf, rect = model.car.get_rotated_sprite() # a faire pour chaque voiture eventuellement
         self.screen.blit(surf, rect)
         surf_texte = model.car.debug_variables(self.font)

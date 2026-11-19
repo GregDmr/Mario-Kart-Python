@@ -70,7 +70,6 @@ class GameModel:
         # Sécurité si le jeu n'est pas en cours de course ou si aucun circuit n'est chargé
         if self.state != GameState.RACING or self.circuit is None:
             return
-
         # Mise à jour de la position de la voiture et de ses propriétés internes
         self.car.update_position()
 

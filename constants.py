@@ -47,7 +47,7 @@ COLOR_HINT = (150, 150, 170)
 #Charactéristiques des voitures, placeholder pour le moment
 RWD = [1,0] #bool, true si propulsion, false si traction
 STEERING_VELOCITY = [0.1,0.15] #Vitesse de rotation du volant, valeur sans unité
-STEERING_RANGE = [0.8,1.1] #angle max de rotation des roues , RADIAN
+STEERING_RANGE = [0.6,0.5] #angle max de rotation des roues , RADIAN
 WHEEL_BASE = [4] #entraxe des roues longitudinal, METRE
 WHEEL_TRACK = [1.9] #entraxe des roues latéral, METRE
 MAX_ENGINE_TORQUE = [180] #couple max du moteur , N * m
