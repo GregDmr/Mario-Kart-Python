@@ -47,12 +47,12 @@ COLOR_PANEL_BORDER = (60, 60, 100)
 COLOR_HINT = (150, 150, 170)
 
 #Charactéristiques des voitures, placeholder pour le moment
-RWD = [1,0] #bool, true si propulsion, false si traction
+RWD = [1,1] #bool, true si propulsion, false si traction
 STEERING_VELOCITY = [0.1,0.15] #Vitesse de rotation du volant, valeur sans unité
-STEERING_RANGE = [0.8,1.1] #angle max de rotation des roues , RADIAN
+STEERING_RANGE = [0.5,1.1] #angle max de rotation des roues , RADIAN
 WHEEL_BASE = [4,4] #entraxe des roues longitudinal, METRE
 WHEEL_TRACK = [1.9,1.9] #entraxe des roues latéral, METRE
-MAX_ENGINE_TORQUE = [180,180] #couple max du moteur , N * m
+MAX_ENGINE_TORQUE = [200,200] #couple max du moteur , N * m
 CENTER_GRAVITY_Z = [0.3,0.3] #hauteur du CG en m
 CENTER_GRAVITY_X = [0.2,0.2] #position longitudinale du CG a partir du centre geométrique de la voiture (pos ou neg)
 MASS = [600,600]  #masse en kg
@@ -60,7 +60,7 @@ CAR_WIDTH = [2,2] #m
 CAR_HEIGHT = [4.7,4.7]#m
 WHEEL_LENGTH = [0.6,0.6] #m, taille de la roue vue de dessus, dans le sens de roulage
 WHEEL_WIDTH = [0.3,0.3] #m
-CAR_IZZ = [800,800] #KG * m²
+CAR_IZZ = [600,600] #KG * m²
 CAR_SPRITE = ["01_yellow_test.png", "01_yellow_test.png"]
 CAR_SPRITES_DIRECTORY = "assets/sprites/cars"
 
