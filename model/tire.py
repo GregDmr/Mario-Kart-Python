@@ -83,6 +83,7 @@ class Tire :
         self.rot_speed_tire += (torque - Fx * self.tire_radius) / self.inertia * dt #applique la correction de la force sol->roue quoi qu'il arrive
         #mais n'applique pas de ralentissement lors du freinage, il est fait plus loin
 
+        brake_torque *= 2 * (c.BRAKE_BIAS_FRONT if self.offset_length > 0 else 1 - c.BRAKE_BIAS_FRONT) #répartition av/ar (0.5 = égale)
         #le frein s'oppose à la rotation de la roue, sans la faire repartir dans l'autre sens
         if brake_torque > 0:
             brake_step = brake_torque / self.inertia * dt

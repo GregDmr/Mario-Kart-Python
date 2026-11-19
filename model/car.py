@@ -26,7 +26,7 @@ class Car:
         self.steering_velocity = c.STEERING_VELOCITY[chosen_car]
         self.steering_range = c.STEERING_RANGE[chosen_car]
         self.max_torque = c.MAX_ENGINE_TORQUE[chosen_car]
-        self.braking_torque = 300 #attention meme ordre de grandeur que engine torque (plus grand car freinage, mais le calcul pour la force est le meme)
+        self.braking_torque = c.MAX_BRAKING_TORQUE[chosen_car] #attention meme ordre de grandeur que engine torque (plus grand car freinage, mais le calcul pour la force est le meme)
         self.izz = c.CAR_IZZ[chosen_car]
         propulsion = c.RWD[chosen_car]
         self.final_drive = 4
@@ -74,9 +74,9 @@ class Car:
         # torque_multiplier entre -1 et 1 : la logique d'incrémentation reste hard codée volontairement
         if input_dico["decelerate"]:
             if self.torque_multiplier > 0:
-                self.torque_multiplier = -0.1
+                self.torque_multiplier = -0.3
             else :
-                self.torque_multiplier -= 0.05
+                self.torque_multiplier -= 0.1
 
         if input_dico["accelerate"]:
             if self.torque_multiplier < 0:

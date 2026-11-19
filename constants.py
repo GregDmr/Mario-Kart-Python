@@ -53,6 +53,8 @@ STEERING_RANGE = [0.5,1.1] #angle max de rotation des roues , RADIAN
 WHEEL_BASE = [4,4] #entraxe des roues longitudinal, METRE
 WHEEL_TRACK = [1.9,1.9] #entraxe des roues latéral, METRE
 MAX_ENGINE_TORQUE = [200,200] #couple max du moteur , N * m
+MAX_BRAKING_TORQUE = [800,800]
+BRAKE_BIAS_FRONT = 0.62 #part du freinage sur l'essieu avant (0.5 = répartition égale)
 CENTER_GRAVITY_Z = [0.3,0.3] #hauteur du CG en m
 CENTER_GRAVITY_X = [0.2,0.2] #position longitudinale du CG a partir du centre geométrique de la voiture (pos ou neg)
 MASS = [600,600]  #masse en kg
