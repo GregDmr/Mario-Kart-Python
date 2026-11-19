@@ -16,6 +16,8 @@ class Tire :
         self.rot_speed_tire = 0.0
         self.rot_speed_car = 0.0
         self.inertia = 1.2
+        self.def_x = 0.0 #déformation du patch de contact (m), gardée d'une frame à l'autre
+        self.def_y = 0.0
 
     def compute_forces(self):
 
@@ -104,14 +106,28 @@ class Tire :
 
         if self.offset_length>0: #seulement si ce sont les pneus qui sont devant
             v_longi = self.vcx * math.cos(self.car.steering_angle) + self.vcy * math.sin(self.car.steering_angle)
-            v_late = -self.vcx * math.sin(self.car.steering_angle) + self.vcy * math.cos(self.car.steering_angle) #Vitesses a convertir dans le referentiel du pneu
+            v_late = -self.vcx * math.sin(self.car.steering_angle) + self.vcy * math.cos(self.car.steering_angle) 
         else :
             v_longi = self.vcx
             v_late = self.vcy
 
         #vitesses du point de contact du pneu dans le ref de la voiture obtenues -> QUID du pneu lui meme ? Il tourne ou pas ?
-        v_ref = max(1,abs(v_longi)) #vitesse qui permet d'avoir un slip RATIO (dérapage a 1m/s plus violent en roulant a 20 kmh que a 120 kmh)
-        slip_longi = (self.rot_speed_tire * self.tire_radius -v_longi)/v_ref
-        slip_late = math.atan(v_late/v_ref)
+        dt = 1 / c.FPS
+        v_slide_x = self.rot_speed_tire * self.tire_radius - v_longi
+
+        #modèle transitoire (tiremodelingreader eq 5.11) : deformation du contact patch permettant des forces sans slip
+        relax = 1 + max(abs(v_longi), c.RELAX_SPEED_MIN) * dt / c.RELAX_LENGTH #quel ratio de contact patch est remplacé en roulant chaque frame
+        self.def_x = (self.def_x + v_slide_x * dt) / relax # numé : Ajoute de la déformation, déno : on en remplace aussi beacoup
+        self.def_y = (self.def_y + v_late * dt) / relax
+
+        #au dela de cette déformation le patch glisse sur la route
+        def_max = c.MAX_SLIP * c.RELAX_LENGTH
+        def_tot = math.sqrt(self.def_x**2 + self.def_y**2)
+        if def_tot > def_max:
+            self.def_x *= def_max / def_tot
+            self.def_y *= def_max / def_tot
+
+        slip_longi = self.def_x / c.RELAX_LENGTH
+        slip_late = self.def_y / c.RELAX_LENGTH
         combined_slip = math.sqrt(slip_longi**2 + slip_late**2)
         return slip_longi, slip_late, combined_slip

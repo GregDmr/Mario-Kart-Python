@@ -22,6 +22,11 @@ PACEJKA_E_LONG = -1
 PACEJKA_B_LAT = 10
 PACEJKA_C_LAT = 1.3 #palier à environ 0.89 du pic
 PACEJKA_E_LAT = -2.2 #place le pic à un glissement d'environ 0.15, comme en longitudinal
+
+#Modèle transitoire du pneu (déformation du patch de contact)
+RELAX_LENGTH = 0.3 #m, distance roulée pour atteindre 63% de la force
+RELAX_SPEED_MIN = 1.0 #m/s, sous cette vitesse la déformation se dissipe quand meme lentement
+MAX_SLIP = 0.2 #glissement max stocké dans le patch (pic de Pacejka vers 0.15)
 class GameState:
     MENU = "menu"
     RACING = "racing"
@@ -48,4 +53,4 @@ CAR_WIDTH = [2] #m
 CAR_HEIGHT = [4.7]#m
 WHEEL_LENGTH = [0.6] #m, taille de la roue vue de dessus, dans le sens de roulage
 WHEEL_WIDTH = [0.3] #m
-CAR_IZZ = [1500] #KG * m²
+CAR_IZZ = [800] #KG * m²

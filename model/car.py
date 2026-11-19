@@ -197,12 +197,14 @@ class Car:
         self.vx += accels[0] * dt #m/s
         self.vy += accels[1] * dt #m/s
         self.omegad += accels[2] *dt #rad/s
-        if abs(self.vx) < 0.5 and self.desired_torque == 0:
+        if abs(self.vx) < 0.4 and self.desired_torque == 0 and self.steering_angle == 0  :
             self.vx = 0
 
-        if abs(self.vy) < 0.2 and self.desired_torque == 0:
-                    self.vy = 0
-       
+        if abs(self.vy) < 0.4 and self.desired_torque == 0 and self.steering_angle == 0 :
+            self.vy = 0
+        
+        if abs(self.omegad) < 0.05 and self.desired_torque == 0 and self.steering_angle == 0 :
+            self.omegad = 0
 
     def engine_behavior(self, tire_speed):
         """Sert a plafonner la vitesse du moteur (le couple), retourne un multiplicateur pour le couple moteur"""
