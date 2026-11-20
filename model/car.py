@@ -100,7 +100,8 @@ class Car:
                 self.steering_multiplier += min(0.05, abs(self.steering_multiplier))
 
         self.steering_multiplier = max(-1, min(1, self.steering_multiplier))
-        self.steering_angle = self.steering_multiplier * self.steering_range #en radians
+        speed_factor = 1 / (1 + (self.vx / c.STEERING_SPEED_REF)**2) #1 a l'arret, 0.5 a la vitesse de reference
+        self.steering_angle = self.steering_multiplier * self.steering_range * speed_factor #en radians
 
     def compute_desired_torque(self) -> float:
         """ Couple demandé en N.m selon le multiplicateur et le sens de marche """

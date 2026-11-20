@@ -50,6 +50,7 @@ COLOR_HINT = (150, 150, 170)
 RWD = [1,1] #bool, true si propulsion, false si traction
 STEERING_VELOCITY = [0.1,0.15] #Vitesse de rotation du volant, valeur sans unité
 STEERING_RANGE = [0.5,1.1] #angle max de rotation des roues , RADIAN
+STEERING_SPEED_REF = 12 #vitesse (m/s) à laquelle le braquage est divisé par 2
 WHEEL_BASE = [4,4] #entraxe des roues longitudinal, METRE
 WHEEL_TRACK = [1.9,1.9] #entraxe des roues latéral, METRE
 MAX_ENGINE_TORQUE = [200,200] #couple max du moteur , N * m
