@@ -26,7 +26,7 @@ class Car:
         self.steering_velocity = c.STEERING_VELOCITY[chosen_car]
         self.steering_range = c.STEERING_RANGE[chosen_car]
         self.max_torque = c.MAX_ENGINE_TORQUE[chosen_car]
-        self.braking_torque = 300 #attention meme ordre de grandeur que engine torque (plus grand car freinage, mais le calcul pour la force est le meme)
+        self.braking_torque = c.MAX_BRAKING_TORQUE[chosen_car] #attention meme ordre de grandeur que engine torque (plus grand car freinage, mais le calcul pour la force est le meme)
         self.izz = c.CAR_IZZ[chosen_car]
         propulsion = c.RWD[chosen_car]
         self.final_drive = 4
@@ -34,7 +34,8 @@ class Car:
         # Conversion des coordonnées de la grille en pixels
         self.x = start_col * c.TILE_SIZE + c.TILE_SIZE // 2
         self.y = start_row * c.TILE_SIZE + c.TILE_SIZE // 2
-
+        self.fz_ax = 0
+        self.fz_ay = 0
         # Initialisation vitesse et angle
         self.vx: float = 0.0
         self.vy: float = 0.0
@@ -73,9 +74,9 @@ class Car:
         # torque_multiplier entre -1 et 1 : la logique d'incrémentation reste hard codée volontairement
         if input_dico["decelerate"]:
             if self.torque_multiplier > 0:
-                self.torque_multiplier = -0.1
+                self.torque_multiplier = -0.3
             else :
-                self.torque_multiplier -= 0.05
+                self.torque_multiplier -= 0.1
 
         if input_dico["accelerate"]:
             if self.torque_multiplier < 0:
@@ -99,7 +100,8 @@ class Car:
                 self.steering_multiplier += min(0.05, abs(self.steering_multiplier))
 
         self.steering_multiplier = max(-1, min(1, self.steering_multiplier))
-        self.steering_angle = self.steering_multiplier * self.steering_range #en radians
+        speed_factor = 1 / (1 + (self.vx / c.STEERING_SPEED_REF)**2) #1 a l'arret, 0.5 a la vitesse de reference
+        self.steering_angle = self.steering_multiplier * self.steering_range * speed_factor #en radians
 
     def compute_desired_torque(self) -> float:
         """ Couple demandé en N.m selon le multiplicateur et le sens de marche """
@@ -146,6 +148,7 @@ class Car:
     def update_position(self) -> None:
         """ Met à jour la position de la voiture en fonction de sa vitesse"""
         self.tire_mark_list = [m for m in self.tire_mark_list if m.lifespan > 0] #itere dans la liste, mais ne valide pas la classe si lifespan =0 ou moins
+        
         self.compute_speeds(self.compute_accelerations())
         dt = 1 / c.FPS
         self.angle += math.degrees(self.omegad) * dt #omega en rad/s, l'angle reste en degrés
@@ -164,6 +167,7 @@ class Car:
         fx_car = 0
         fy_car = 0
         mom_tot = 0
+        
         for tire in self.list_tires:
             fx,fy,tire_mark = tire.compute_forces()
             if tire.offset_length>0:
@@ -186,8 +190,10 @@ class Car:
         elif self.vx <= -0.2:
             fx_tot += 30 #resistance de roulement 
 
-        ax = fx_tot/self.mass + self.omegad*self.vy #le terme de rotation des vecteurs vitesse était oublié : la voiture pouvait garder sa vitesse vx dans les virages sans cout
-        ay = fy_tot/self.mass - self.omegad*self.vx
+        self.fz_ax = fx_tot/self.mass #accélérations réelles du corps, gardées pour le calcul de Fz à la frame suivante
+        self.fz_ay = fy_tot/self.mass
+        ax = self.fz_ax + self.omegad*self.vy #le terme de rotation des vecteurs vitesse était oublié : la voiture pouvait garder sa vitesse vx dans les virages sans cout
+        ay = self.fz_ay - self.omegad*self.vx
 
 
         omegadd = mom_tot/self.izz 

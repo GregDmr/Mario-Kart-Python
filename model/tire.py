@@ -14,6 +14,7 @@ class Tire :
         self.tire_radius = 0.3
         #charge au repos : part du poids opposée à l'essieu du pneu, partagée entre les 2 pneus de l'essieu
         self.Fz = car.mass * c.GRAVITY * (car.wheelbase - abs(offset_length)) / (2 * car.wheelbase)
+        self.Fz_static = self.Fz #charge nominale, ne change jamais
         self.rot_speed_tire = 0.0
         self.rot_speed_car = 0.0
         self.inertia = 1.2
@@ -82,6 +83,7 @@ class Tire :
         self.rot_speed_tire += (torque - Fx * self.tire_radius) / self.inertia * dt #applique la correction de la force sol->roue quoi qu'il arrive
         #mais n'applique pas de ralentissement lors du freinage, il est fait plus loin
 
+        brake_torque *= 2 * (c.BRAKE_BIAS_FRONT if self.offset_length > 0 else 1 - c.BRAKE_BIAS_FRONT) #répartition av/ar (0.5 = égale)
         #le frein s'oppose à la rotation de la roue, sans la faire repartir dans l'autre sens
         if brake_torque > 0:
             brake_step = brake_torque / self.inertia * dt
@@ -115,8 +117,16 @@ class Tire :
         F = friction * Fz * math.sin(c.PACEJKA_C_LAT * math.atan(inner))
         return -F * sy / s_combined #il y a un moins car la vitesse late de la roue est toujrous nulel donc le slip fait -v_late - a opposers
 
-    def compute_Fz(self): #POUR PLUS TARD
-        self.Fz = self.Fz  
+    def compute_Fz(self):
+        car = self.car
+        axle_share = (car.wheelbase - abs(self.offset_length)) / car.wheelbase #part du poids portée par l'essieu de ce pneu
+        transfer_long = car.mass * car.fz_ax * car.center_grav_z / (2 * car.wheelbase)
+        transfer_lat = car.mass * car.fz_ay * car.center_grav_z / car.wheeltrack * axle_share
+        if self.offset_length > 0: #avant : se décharge quand on accélère, se charge quand on freine
+            transfer_long = -transfer_long
+        if self.offset_width > 0: #gauche : se décharge dans un virage à gauche
+            transfer_lat = -transfer_lat
+        self.Fz = max(self.Fz_static + transfer_long + transfer_lat, 0.1 * self.Fz_static) #plancher : évite un Fz nul ou négatif
 
     def compute_slips(self) :
 
