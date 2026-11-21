@@ -1,4 +1,5 @@
 import pygame
+from pathlib import Path
 
 FPS = 60
 
@@ -74,3 +75,15 @@ DEFAULT_KEYBINDS = [
     {"accelerate": [pygame.K_UP], "decelerate": [pygame.K_DOWN],
      "turn_left": [pygame.K_LEFT], "turn_right": [pygame.K_RIGHT], "use_item": [pygame.K_RETURN]},
 ]
+
+# -- PATH --
+BASE_DIR = Path(__file__).parent
+ASSETS_DIR = BASE_DIR / "assets"
+
+# Dossiers spécifiques
+PATH_ITEMS = ASSETS_DIR / "items"
+
+# Sprites des items
+SPRITE_ITEMBOX = PATH_ITEMS / "sprite_itembox.webp"
+SPRITE_FAKE_ITEMBOX = PATH_ITEMS / "sprite_fake_itembox.webp"
+SPRITE_BANANA = PATH_ITEMS / "sprite_banana.webp"

@@ -1,54 +1,96 @@
 import random
 import pygame
 from controller.audio_controller import AudioController
+import constants as c
 
-# Faire une classe mère Item pour les objets de la piste avec les méthodes collisions etc
+class Item:
+    """
+    Classe mère de tous les items présents sur la piste
+    """
 
+    def __init__(self, x: float, y: float, size: int = 32, image_path=None):
+        # Booléens pour gérer l'état de l'item
+        self.is_active = True  # Visibilité ou interaction sur la piste
+        self.to_remove = False  # Indique si l'objet doit être détruit ou non
 
-class ItemBox:
-    def __init__(self, x: float, y: float, size=32):
-        # Hitbox et positionnement (On initialise la zone géométrique puis on centre le rectangle aux coordonnées (x, y))
-        self.rect = pygame.Rect(x, y, size, size)
-        self.rect.center = (int(x), int(y))   
+        # Chargement et redimensionnement du sprite
+        try:
+            raw_img = pygame.image.load(str(image_path)).convert_alpha()
+            self.image = pygame.transform.scale(raw_img, (size, size))
+        except Exception as e:
+            print(f"Erreur sur le chargement du sprite de la classe {self.__class__.__name__}: {e}")
+            self.image = pygame.Surface((size, size))
 
-        # Gestion de l'état du cube
-        self.is_active = True           # Définit sa présence ou non sur le circuit
-        self.respawn_delay = 5000 # Temps d'attente avant la réapparition (en ms)
+        # Création et centrage du rectangle en une seule ligne
+        self.rect = self.image.get_rect(center=(int(x), int(y)))
 
-        # Chargement du sprite de l'item box et redimensionnement (convert_alpha() optimise le rendu avec transparence dans Pygame)
-        raw_image_itembox = pygame.image.load("assets/items/sprite_cube.png").convert_alpha()
-        self.image_itembox = pygame.transform.scale(raw_image_itembox, (size, size))
+    def collision(self, car, audio_controller=None) -> None:
+        """ 
+        Fonction de gestion des collisions.
+        A surcharger obligatoirement dans les sous classes.
+        """
+        raise NotImplementedError(f"La méthode collision doit être implémentée dans {self.__class__.__name__}")
 
-    def collision(self, player, audio_controller=None) -> None:
-        """ Gère la collision avec le kart """
-        # Cube déjà récupéré
+    def update(self) -> None:
+        """ 
+        Fonction de gestion des booléens.
+        A surcharger dans les sous classes.
+        """
+        pass
+
+    def draw(self, surface: pygame.Surface) -> None:
+        # On dessine uniquement les items actifs
+        if self.is_active:
+            surface.blit(self.image, self.rect.topleft)
+            # Affichage hitbox poru debug
+            pygame.draw.rect(surface, (255, 0, 0), self.rect, 1)
+
+class ItemBox(Item):
+    """
+    Gestion des ItemBox avec distribution d'un item au joueur
+    """
+
+    def __init__(self, x: float, y: float, size: int = 32):
+        # Initialisation et positionnement via la classe mère Item
+        super().__init__(x, y, size, image_path=c.SPRITE_ITEMBOX)
+        
+        self.respawn_delay: int = 5000  # Temps avant réapparition (en ms)
+        self.respawn_time: int = 0      # Timestamp de la prochaine réapparition
+
+    def collision(self, car, audio_controller=None) -> None:
+        """
+        Gestion collision entre item et kart uniquement (rajouter collision avec greenshell par exemple pour faire disparaitre le cube)
+        """
+        # On ignore la collision si cube inactif
         if not self.is_active:
             return
 
-        # Désactivation du cube 
+        # On passe le cube en inactif
         self.is_active = False
+        
+        # Démarrage chrono pour la réapparition
+        self.respawn_time = pygame.time.get_ticks() + self.respawn_delay
 
-        # Lecture du son 
+        # Effet sonore
         if audio_controller:
             audio_controller.play_sound("get_item")
 
-        # Temps avant la réapparition
-        self.respawn_time = pygame.time.get_ticks() + self.respawn_delay
-
-        # Rajouter la transmission de l'item au joueur après une sélection aléatoire
-
     def update(self) -> None:
-        """ Vérifie si le délai est écoulé pour faire réapparaître le cube """
-        # On vérifie si le cube est bien désactivé et si le temps nécessaire est écoulé
+        """
+        Vérifie si le temps d'attente est écoulé pour faire réapparaître le cube.
+        """
         if not self.is_active:
             current_time = pygame.time.get_ticks()
             if current_time >= self.respawn_time:
-                # Réactivation du cube
                 self.is_active = True
-    
-    def draw(self, surface: pygame.Surface) -> None:
-        """ Affiche le sprite réduit aux coordonnées du rectangle """
-        if self.is_active: 
-            surface.blit(self.image_itembox, self.rect.topleft)
-            # Affichage du contour de la hitbox pour debug (A RETIRER ENSUITE)
-            pygame.draw.rect(surface, (255, 0, 0), self.rect, 1)
+
+class Fake_ItemBox(Item):
+    def __init__(self, x, y, size=32):
+        super().__init__(x, y, size, image_path=c.SPRITE_FAKE_ITEMBOX)
+
+class Banana(Item):
+    def __init__(self, x, y, size=32):
+        super().__init__(x, y, size, image_path=c.SPRITE_BANANA)
+
+class GreenShell(Item):
+    pass
