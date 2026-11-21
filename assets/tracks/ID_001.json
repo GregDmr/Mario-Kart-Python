@@ -1,0 +1,12 @@
+{
+  "track_name": "Circuit_Peanut",
+  "track_id": "ID_001", 
+  "starting_positions": [
+    {"player_id": 1, "x": 480, "y": 670, "angle": 90},
+    {"player_id": 2, "x": 480, "y": 580, "angle": 90}
+  ],
+  "item_boxes": [
+    {"x": 910, "y": 698},
+    {"x": 912, "y": 643}
+  ]
+}

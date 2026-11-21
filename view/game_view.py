@@ -1,4 +1,4 @@
-import os
+import json
 import pygame
 from constants import (
     WINDOW_WIDTH, WINDOW_HEIGHT, TILE_SIZE,
@@ -6,7 +6,7 @@ from constants import (
     GameState
 )
 from model.game_model import GameModel
-from model.menu import Menu, track_name
+from model.menu import Menu
 
 MAX_VISIBLE_OPTIONS = 6  #Au-delà, la liste défile
 
@@ -15,7 +15,6 @@ HINTS = {  #Rappel des touches propre à chaque écran
     GameState.TRACK_SELECT: "↑ ↓ : choisir    Entrée : lancer la course    Echap : retour",
     GameState.PAUSE: "↑ ↓ : choisir    Entrée : valider    Echap : reprendre",
 }
-
 
 class GameView:
 
@@ -89,7 +88,10 @@ class GameView:
         """Ecran affiché pendant le chargement du circuit"""
         text = self.title_font.render("Chargement...", True, COLOR_ACCENT)
         self.screen.blit(text, text.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 - 30)))
-        name = self.name_font.render(track_name(os.path.basename(track_path)), True, COLOR_TEXT)  #basename : on garde "01_test_track.png" sans le dossier
+        with open(track_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                display_name = data.get("track_name", "Circuit").replace("_", " ")
+        name = self.name_font.render(display_name, True, COLOR_TEXT)  #basename : on garde "01_test_track.png" sans le dossier
         self.screen.blit(name, name.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 40)))
 
     def _draw_veil(self):

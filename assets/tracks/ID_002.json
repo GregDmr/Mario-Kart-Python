@@ -1,0 +1,13 @@
+{
+  "track_name": "Prairie_Neige",
+  "track_id": "ID_002", 
+  "starting_positions": [
+    {"player_id": 1, "x": 500, "y": 550, "angle": 0},
+    {"player_id": 2, "x": 540, "y": 570, "angle": 0}
+  ],
+  "item_boxes": [
+    {"x": 436, "y": 152},
+    {"x": 700, "y": 418},
+    {"x": 910, "y": 698}
+  ]
+}

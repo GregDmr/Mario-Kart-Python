@@ -1,14 +1,50 @@
 from model.road_tile import RoadTile
 from constants import TILE_SIZE
+import json 
+import os
+from tools.track_converter import convert_track
+from model.item import ItemBox
 
 
 class Circuit:
 
-    def __init__(self,  grid: list[list[RoadTile]]):
-        """ Initialisation du circuit à partir de la grille 2D des tuiles """
-        self.grid = grid
-        self.rows = len(grid) # Nombre total de lignes
-        self.cols = len(grid[0]) if grid else 0 # Nombre total de colonnes
+    def __init__(self, json_path: str):
+        """Initialisation du circuit à partir de son fichier JSON de configuration"""
+        self.json_path = json_path
+
+        # Lecture du fichier JSON
+        with open(json_path, "r", encoding="utf-8") as f:
+            config = json.load(f)
+
+        self.track_id = config.get("track_id")
+        self.name = config.get("track_name", "Circuit")
+        self.starting_positions = config.get("starting_positions", [])
+        
+        # Instanciation immédiate des ItemBox depuis les coordonnées du JSON
+        self.item_boxes = [
+            ItemBox(x=box["x"], y=box["y"]) 
+            for box in config.get("item_boxes", [])
+        ]
+
+        # Reconstitution du chemin d'accès à l'image PNG de la texture
+        track_dir = os.path.dirname(json_path)
+        self.texture_path = os.path.join(track_dir, f"{self.name}.png")
+
+        # Récupération de la grille d'entiers via convert_track
+        type_grid = convert_track(self.texture_path)
+
+        # Conversion en matrice 2D d'objets RoadTile
+        self.grid: list[list[RoadTile]] = [
+            [
+                RoadTile(col=col_idx, row=row_idx, road_type=type_grid[row_idx][col_idx])
+                for col_idx in range(len(type_grid[0]))
+            ]
+            for row_idx in range(len(type_grid))
+        ]
+
+        # Conversion de l'image PNG en grille 2D de RoadTile
+        self.rows = len(self.grid) if self.grid else 0
+        self.cols = len(self.grid[0]) if self.grid else 0
 
     def get_tile(self, col: int, row: int) -> RoadTile | None:
         """ Récupération d'une tuile, va servir à déterminer l'interaction voiture / sol """

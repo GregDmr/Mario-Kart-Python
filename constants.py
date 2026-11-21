@@ -82,6 +82,7 @@ ASSETS_DIR = BASE_DIR / "assets"
 
 # Dossiers spécifiques
 PATH_ITEMS = ASSETS_DIR / "items"
+PATH_TRACKS = ASSETS_DIR / "tracks"
 
 # Sprites des items
 SPRITE_ITEMBOX = PATH_ITEMS / "sprite_itembox.webp"
