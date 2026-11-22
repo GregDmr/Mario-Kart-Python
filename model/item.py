@@ -27,7 +27,7 @@ class Item:
         # Création et centrage du rectangle en une seule ligne
         self.rect = self.image.get_rect(center=(int(x), int(y)))
 
-    def collision(self, car, audio_controller=None) -> None:
+    def collision(self, player, audio_controller=None) -> None:
         """ 
         Fonction de gestion des collisions.
         A surcharger obligatoirement dans les sous classes.
@@ -91,7 +91,11 @@ class ItemBox(Item):
         """ Gestion du don d'objet au joueur"""
         # Test en donnant obligatoirement un champignon (A MODIFIER)
         if player.item is None:
-            player.item = Mushroom()
+            available_items = [Mushroom, Fake_ItemBox, Banana, GreenShell, BlueShell, Star]
+            # Choix équiprobable entre les items de la liste 
+            item_class = random.choice(available_items)
+            # Attribution de l'item au joueur
+            player.item = item_class()
 
     def update(self) -> None:
         """
@@ -111,7 +115,7 @@ class Mushroom(Item):
         # Redimensionnement de l'icone pour le HUD
         self.icon = pygame.transform.scale(self.image, (icon_size, icon_size))
 
-    def collision(self, car, audio_controller=None) -> None:
+    def collision(self, player, audio_controller=None) -> None:
         """Un champignon en inventaire n'a pas de collision physique au sol. A implémenter ensuite"""
         pass
 
@@ -125,12 +129,74 @@ class Mushroom(Item):
         pass
 
 class Fake_ItemBox(Item):
-    def __init__(self, x, y, size=32):
-        super().__init__(x, y, size, image_path=c.SPRITE_FAKE_ITEMBOX)
+    def __init__(self, x: float = 0, y: float = 0, track_size: int = 32, icon_size: int = 64):
+        super().__init__(x, y, size=track_size, image_path=c.SPRITE_FAKE_ITEMBOX)
+        self.name = "Fake_ItemBox"
+        # Redimensionnement de l'icone pour le HUD
+        self.icon = pygame.transform.scale(self.image, (icon_size, icon_size))
+
+    def collision(self, car, audio_controller=None):
+        pass
+
+    def use(self, player, audio_controller=None): 
+        if audio_controller:
+            audio_controller.play_sound("drop_fake_itembox")
+
+
 
 class Banana(Item):
-    def __init__(self, x, y, size=32):
-        super().__init__(x, y, size, image_path=c.SPRITE_BANANA)
+    def __init__(self, x: float = 0, y: float = 0, track_size: int = 32, icon_size: int = 64):
+        super().__init__(x, y, size=track_size, image_path=c.SPRITE_BANANA)
+        self.name = "Banana"
+        # Redimensionnement de l'icone pour le HUD
+        self.icon = pygame.transform.scale(self.image, (icon_size, icon_size))
+
+    def collision(self, car, audio_controller=None):
+        pass
+
+    def use(self, player, audio_controller=None):
+        if audio_controller:
+            audio_controller.play_sound("drop_banana")
 
 class GreenShell(Item):
-    pass
+    def __init__(self, x: float = 0, y: float = 0, track_size: int = 32, icon_size: int = 64):
+        super().__init__(x, y, size=track_size, image_path=c.SPRITE_GREEN_SHELL)
+        self.name = "GreenShell"
+        # Redimensionnement de l'icone pour le HUD
+        self.icon = pygame.transform.scale(self.image, (icon_size, icon_size))
+
+    def collision(self, car, audio_controller=None):
+        pass
+
+    def use(self, player, audio_controller=None):
+        if audio_controller:
+            audio_controller.play_sound("drop_greenshell")
+
+class BlueShell(Item):
+    def __init__(self, x: float = 0, y: float = 0, track_size: int = 32, icon_size: int = 64):
+        super().__init__(x, y, size=track_size, image_path=c.SPRITE_BLUE_SHELL)
+        self.name = "BlueShell"
+        # Redimensionnement de l'icone pour le HUD
+        self.icon = pygame.transform.scale(self.image, (icon_size, icon_size))
+
+    def collision(self, car, audio_controller=None):
+        pass
+
+    def use(self, player, audio_controller=None):
+        if audio_controller:
+            audio_controller.play_sound("drop_blueshell")
+
+class Star(Item):
+    def __init__(self, x: float = 0, y: float = 0, track_size: int = 32, icon_size: int = 64):
+        super().__init__(x, y, size=track_size, image_path=c.SPRITE_STAR)
+        self.name = "Star"
+        # Redimensionnement de l'icone pour le HUD
+        self.icon = pygame.transform.scale(self.image, (icon_size, icon_size))
+
+    def collision(self, car, audio_controller=None):
+        pass
+
+    def use(self, player, audio_controller=None):
+        if audio_controller:
+            audio_controller.play_sound("use_star")
+    
