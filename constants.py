@@ -46,6 +46,7 @@ COLOR_ACCENT = (255, 200, 0)
 COLOR_PANEL = (30, 30, 50)
 COLOR_PANEL_BORDER = (60, 60, 100)
 COLOR_HINT = (150, 150, 170)
+COLOR_HUD = (255, 0, 0)
 
 #Charactéristiques des voitures, placeholder pour le moment
 RWD = [1,1] #bool, true si propulsion, false si traction
@@ -88,3 +89,4 @@ PATH_TRACKS = ASSETS_DIR / "tracks"
 SPRITE_ITEMBOX = PATH_ITEMS / "sprite_itembox.webp"
 SPRITE_FAKE_ITEMBOX = PATH_ITEMS / "sprite_fake_itembox.webp"
 SPRITE_BANANA = PATH_ITEMS / "sprite_banana.webp"
+SPRITE_MUSHROOM = PATH_ITEMS / "sprite_mushroom.webp"
