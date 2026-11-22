@@ -1,8 +1,8 @@
 import os
+import json
 from abc import ABC, abstractmethod
-from constants import GameState
+from constants import GameState, PATH_TRACKS
 
-TRACKS_DIRECTORY = "assets/tracks"
 
 
 def texture_path(track_path: str):
@@ -11,16 +11,6 @@ def texture_path(track_path: str):
     if os.path.exists(texture):
         return texture
     return track_path
-
-
-def track_name(file_name: str):
-    """Nom affiché d'un circuit : "01_test_track.png" donne "Test track" """
-    name = os.path.splitext(file_name)[0]
-    number, _, rest = name.partition("_")
-    if number.isdigit() and rest:  #On retire le numéro d'ordre s'il y en a un
-        name = rest
-    return name.replace("_", " ").capitalize()
-
 
 class Menu(ABC):
     """Classe pour un menu générique"""
@@ -69,24 +59,45 @@ class MainMenu(Menu):
 
 
 class TrackMenu(Menu):
-    """Choix du circuit parmi les cartes du dossier des circuits"""
+    """Choix du circuit parmi les cartes disponibles"""
 
     title = "Choix du circuit"
 
     def __init__(self, game_model):
-        names = sorted(n for n in os.listdir(TRACKS_DIRECTORY)
-                       if n.lower().endswith(".png") and not n.lower().endswith("_texture.png"))  #On garde les cartes, pas les textures
-        self.tracks = [os.path.join(TRACKS_DIRECTORY, n) for n in names]
-        super().__init__(game_model, [track_name(n) for n in names])
+        # On liste uniquement les fichiers JSON 
+        json_names = sorted(n for n in os.listdir(PATH_TRACKS) if n.lower().endswith(".json"))
+        self.tracks = [os.path.join(PATH_TRACKS, n) for n in json_names]
+
+        # On extrait le track_name de chaque JSON pour l'affichage dans le menu
+        display_names = []
+        for path in self.tracks:
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                name = data.get("track_name", "Circuit").replace("_", " ")
+                display_names.append(name)
+
+        super().__init__(game_model, display_names)
 
     def select(self):
-        self.game_model.prepare_race(self.tracks[self.selected])  #La course est chargée à l'écran suivant
+        # Transmet le chemin du JSON sélectionné au GameModel
+        self.game_model.prepare_race(self.tracks[self.selected])
 
     def back(self):
         self.game_model.change_state(GameState.MENU)
 
     def preview_path(self):
-        return texture_path(self.tracks[self.selected])
+        """Retrouve l'image PNG de texture associée au JSON sélectionné"""
+
+        json_path = self.tracks[self.selected]
+        with open(json_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        
+        # On reconstruit le chemin de l'image à partir du track_name du JSON
+        track_name = data.get("track_name")
+        png_path = os.path.join(PATH_TRACKS, f"{track_name}.png")
+
+        return png_path
+
 
 
 class PauseMenu(Menu):

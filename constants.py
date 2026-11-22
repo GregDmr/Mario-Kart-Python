@@ -1,4 +1,5 @@
 import pygame
+from pathlib import Path
 
 FPS = 60
 
@@ -45,6 +46,7 @@ COLOR_ACCENT = (255, 200, 0)
 COLOR_PANEL = (30, 30, 50)
 COLOR_PANEL_BORDER = (60, 60, 100)
 COLOR_HINT = (150, 150, 170)
+COLOR_HUD = (255, 0, 0)
 
 #Charactéristiques des voitures, placeholder pour le moment
 RWD = [1,1] #bool, true si propulsion, false si traction
@@ -69,8 +71,34 @@ CAR_SPRITES_DIRECTORY = "assets/sprites/cars"
 
 #Touches par défaut de chaque joueur (action -> touches)
 DEFAULT_KEYBINDS = [
-    {"accelerate": [pygame.K_z, pygame.K_w], "decelerate": [pygame.K_s],
-     "turn_left": [pygame.K_q, pygame.K_a], "turn_right": [pygame.K_d], "use_item": [pygame.K_SPACE]},
-    {"accelerate": [pygame.K_UP], "decelerate": [pygame.K_DOWN],
-     "turn_left": [pygame.K_LEFT], "turn_right": [pygame.K_RIGHT], "use_item": [pygame.K_RETURN]},
+    {"accelerate": [pygame.K_z, pygame.K_w], 
+     "decelerate": [pygame.K_s],
+     "turn_left": [pygame.K_q, pygame.K_a], 
+     "turn_right": [pygame.K_d], 
+     "use_item": [pygame.K_SPACE],
+     "klaxon": [pygame.K_LSHIFT]},
+    
+    {"accelerate": [pygame.K_UP], 
+     "decelerate": [pygame.K_DOWN],
+     "turn_left": [pygame.K_LEFT],
+     "turn_right": [pygame.K_RIGHT], 
+     "use_item": [pygame.K_RETURN],
+     "klaxon": [pygame.K_RSHIFT]}
 ]
+
+# -- PATH --
+BASE_DIR = Path(__file__).parent
+ASSETS_DIR = BASE_DIR / "assets"
+
+# Dossiers spécifiques
+PATH_ITEMS = ASSETS_DIR / "items"
+PATH_TRACKS = ASSETS_DIR / "tracks"
+
+# Sprites des items
+SPRITE_ITEMBOX = PATH_ITEMS / "sprite_itembox.webp"
+SPRITE_FAKE_ITEMBOX = PATH_ITEMS / "sprite_fake_itembox.webp"
+SPRITE_BANANA = PATH_ITEMS / "sprite_banane.webp"
+SPRITE_MUSHROOM = PATH_ITEMS / "sprite_mushroom.webp"
+SPRITE_GREEN_SHELL = PATH_ITEMS / "sprite_green_shell.webp"
+SPRITE_BLUE_SHELL = PATH_ITEMS / "sprite_blue_shell.webp"
+SPRITE_STAR = PATH_ITEMS / "sprite_star.webp"

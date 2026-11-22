@@ -1,12 +1,12 @@
-import os
+import json
 import pygame
 from constants import (
     WINDOW_WIDTH, WINDOW_HEIGHT, TILE_SIZE,
-    COLOR_BG, COLOR_TEXT, COLOR_ACCENT, COLOR_PANEL, COLOR_PANEL_BORDER, COLOR_HINT,
+    COLOR_BG, COLOR_TEXT, COLOR_ACCENT, COLOR_PANEL, COLOR_PANEL_BORDER, COLOR_HINT, COLOR_HUD,
     GameState
 )
 from model.game_model import GameModel
-from model.menu import Menu, track_name
+from model.menu import Menu
 
 MAX_VISIBLE_OPTIONS = 6  #Au-delà, la liste défile
 
@@ -15,7 +15,6 @@ HINTS = {  #Rappel des touches propre à chaque écran
     GameState.TRACK_SELECT: "↑ ↓ : choisir    Entrée : lancer la course    Echap : retour",
     GameState.PAUSE: "↑ ↓ : choisir    Entrée : valider    Echap : reprendre",
 }
-
 
 class GameView:
 
@@ -89,7 +88,10 @@ class GameView:
         """Ecran affiché pendant le chargement du circuit"""
         text = self.title_font.render("Chargement...", True, COLOR_ACCENT)
         self.screen.blit(text, text.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 - 30)))
-        name = self.name_font.render(track_name(os.path.basename(track_path)), True, COLOR_TEXT)  #basename : on garde "01_test_track.png" sans le dossier
+        with open(track_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                display_name = data.get("track_name", "Circuit").replace("_", " ")
+        name = self.name_font.render(display_name, True, COLOR_TEXT)  #basename : on garde "01_test_track.png" sans le dossier
         self.screen.blit(name, name.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 40)))
 
     def _draw_veil(self):
@@ -145,5 +147,36 @@ class GameView:
         mx, my = pygame.mouse.get_pos()
         mouse_surf = self.font.render(f"Souris: ({mx}, {my})", True, (255, 255, 0))
         self.screen.blit(mouse_surf, (WINDOW_WIDTH - 200, 10))
+
+        # Affichage interface des objets
+        self._draw_items_hud(model.players)
+
+
+    def _draw_items_hud(self, players: list):
+        """Affiche le slot d'objet pour les 2 joueurs (J1 en haut à gauche, J2 en haut à droite)."""
+        # Taille de la boîte
+        box_size = 100
+        # Ecart par rapport au bord
+        margin = 20
+
+        # Positions fixes pour les 2 joueurs
+        hud_positions = [
+            (margin, margin),                          # J1 : Haut Gauche
+            (WINDOW_WIDTH - margin - box_size, margin) # J2 : Haut Droite
+        ]
+        
+        for index, player in enumerate(players):
+            # On dessine le slot si le joueur a un item et qu'il a un icone
+            if player.item is not None and player.item.icon is not None:
+                # Récupération des coordonnées et instanciation de l'objet pygame pour le tracé
+                x, y = hud_positions[index]
+                rect = pygame.Rect(x, y, box_size, box_size)
+
+                # Dessin des contours d'un carré avec coins arrondis pour mettre l'item dedans
+                pygame.draw.rect(self.screen, COLOR_HUD, rect, width=3, border_radius=24)
+
+                # Centrage et affichage de l'icône de l'item
+                icon_rect = player.item.icon.get_rect(center=rect.center)
+                self.screen.blit(player.item.icon, icon_rect)
         
         

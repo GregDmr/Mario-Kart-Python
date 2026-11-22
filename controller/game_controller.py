@@ -62,8 +62,13 @@ class GameController:
             self.model.change_state(c.GameState.PAUSE)
         elif self.model.state == c.GameState.RACING:
             for index, handler in enumerate(self.input_handlers):
-                if handler.is_item_key(key):
-                    self.model.use_item(index)
+                # Gestion touche pour utilisation item
+                if key in handler.keybinds.get("use_item", []):
+                    self.model.use_item(index, self.audio_handler)
+                # Gestion touche pour klaxon
+                elif key in handler.keybinds.get("klaxon", []):
+                    sound_name = f'horn{index+1}'
+                    self.audio_handler.play_sound(sound_name)
 
         if self.model.state == c.GameState.LOADING:  #Un circuit vient d'être choisi
             self.render()  #On affiche l'écran de chargement avant de charger, sinon il n'apparaîtrait jamais
