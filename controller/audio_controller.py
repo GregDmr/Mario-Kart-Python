@@ -19,6 +19,9 @@ class AudioController :
     def load_all_sounds(self, folder_path: str) -> None:
         """ Fonction pour parcourir tout le dossier des sons et les charger dans le dictionnaire. """
         for filename in os.listdir(folder_path):
+            # On filtre uniquement les mp3
+            if not filename.lower().endswith(".mp3"):
+                continue
             sound_name = os.path.splitext(filename)[0]
             file_path = os.path.join(folder_path, filename)
             sound = pygame.mixer.Sound(file_path)

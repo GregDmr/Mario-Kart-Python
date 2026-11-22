@@ -71,10 +71,19 @@ CAR_SPRITES_DIRECTORY = "assets/sprites/cars"
 
 #Touches par défaut de chaque joueur (action -> touches)
 DEFAULT_KEYBINDS = [
-    {"accelerate": [pygame.K_z, pygame.K_w], "decelerate": [pygame.K_s],
-     "turn_left": [pygame.K_q, pygame.K_a], "turn_right": [pygame.K_d], "use_item": [pygame.K_SPACE]},
-    {"accelerate": [pygame.K_UP], "decelerate": [pygame.K_DOWN],
-     "turn_left": [pygame.K_LEFT], "turn_right": [pygame.K_RIGHT], "use_item": [pygame.K_RETURN]},
+    {"accelerate": [pygame.K_z, pygame.K_w], 
+     "decelerate": [pygame.K_s],
+     "turn_left": [pygame.K_q, pygame.K_a], 
+     "turn_right": [pygame.K_d], 
+     "use_item": [pygame.K_SPACE],
+     "klaxon": [pygame.K_LSHIFT]},
+    
+    {"accelerate": [pygame.K_UP], 
+     "decelerate": [pygame.K_DOWN],
+     "turn_left": [pygame.K_LEFT],
+     "turn_right": [pygame.K_RIGHT], 
+     "use_item": [pygame.K_RETURN],
+     "klaxon": [pygame.K_RSHIFT]}
 ]
 
 # -- PATH --
