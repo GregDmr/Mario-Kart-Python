@@ -25,7 +25,3 @@ class InputHandler:
 
         # On retourne le dictionnaire des actions
         return p
-
-    def is_item_key(self, key: int) -> bool:
-        """ Indique si la touche sert à utiliser un objet """
-        return key in self.keybinds["use_item"]

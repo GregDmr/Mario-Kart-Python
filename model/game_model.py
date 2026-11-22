@@ -106,8 +106,9 @@ class GameModel:
                 if item.is_active and player.car.get_rect().colliderect(item.rect):
                     item.collision(player, audio_controller)
 
-    def use_item(self, player_index: int) -> None:
+    def use_item(self, player_index: int, audio_controller=None) -> None:
         """ Le joueur utilise son objet (à compléter avec les objets) """
         player = self.players[player_index]
         if player.item is None:
             return
+        player.use_item(audio_controller)

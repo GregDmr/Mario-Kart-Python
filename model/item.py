@@ -115,6 +115,15 @@ class Mushroom(Item):
         """Un champignon en inventaire n'a pas de collision physique au sol. A implémenter ensuite"""
         pass
 
+    def use(self, player, audio_controller=None):
+        """ Applique le boost du champignon avec un son """
+        # Son
+        if audio_controller:
+            audio_controller.play_sound("kart_boost")
+
+        # Rajouter l'accélération
+        pass
+
 class Fake_ItemBox(Item):
     def __init__(self, x, y, size=32):
         super().__init__(x, y, size, image_path=c.SPRITE_FAKE_ITEMBOX)

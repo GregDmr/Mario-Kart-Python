@@ -13,3 +13,12 @@ class Player:
         self.name = f"Joueur {index + 1}"
         self.car = car
         self.item = None #objet possédé
+
+    def use_item(self, audio_controller=None):
+        """ Utilisation de l'objet du joueur """
+        # Vérification si le joueur a un objet
+        if self.item is not None:
+            # Utilisation de la méthode use de l'item du joueur
+            self.item.use(self, audio_controller)
+            # On vide l'inventaire du joueur
+            self.item = None
