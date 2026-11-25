@@ -70,6 +70,9 @@ class Car:
         rect.center = (centre_x, centre_y)  # On positionne le centre ici !
         return rect
 
+    def calcul_vitesse_abs(self):
+        """ Renvoie la vitesse absolue de la voiture qui sert pour l'envoie des items """
+        return math.hypot(self.vx, self.vy)
 
     def compute_new_metrics(self, input_dico):
 

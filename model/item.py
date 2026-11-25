@@ -96,7 +96,7 @@ class ItemBox(Item):
             # Choix équiprobable entre les items de la liste 
             item_class = random.choice(available_items)
             # Attribution de l'item au joueur
-            player.item = Bobomb() # item_class()
+            player.item = item_class()
 
     def update(self) -> None:
         """
@@ -200,21 +200,81 @@ class GreenShell(Item):
         # Redimensionnement de l'icone pour le HUD
         self.icon = pygame.transform.scale(self.image, (icon_size, icon_size))
 
+        # Position et physique de base
+        self.x = float(x)
+        self.y = float(y)
+        self.angle = 0.0
+        self.speed = 12.0
+        self.dir_x = 0.0
+        self.dir_y = 0.0
+        self.owner = None
+
+        # Synchronisation du rectangle Pygame avec les coordonnées initiales
+        self.rect = self.image.get_rect(center=(int(self.x), int(self.y)))
+
+    def update(self):
+        """ Déplacement en ligne droite """
+        if not self.is_active:
+            return
+
+        # Déplacement frame par frame
+        self.x += self.dir_x * self.speed
+        self.y += self.dir_y * self.speed
+
+        # Synchronisation de la hitbox Pygame
+        self.rect.center = (int(self.x), int(self.y))
+
+        # Dès que la carapace ne touche plus le kart du lanceur, on retire l'immunité
+        if self.owner and not self.rect.colliderect(self.owner.car.get_rect()):
+            self.owner = None
+
     def collision(self, player, audio_controller=None):
-        """ A FAIRE : implémenter la collision avec les murs car item mobile"""
-        # Activation de l'effet sur la voiture du joueur
+        if not self.is_active:
+            return
+
+        # On ignore le choc si c'est encore le joueur qui vient de la lancer
+        if player == self.owner:
+            return
+
+        # Effet sur le joueur touché
         player.car.big_hit()
                 
-        # Bruitage du choc
         if audio_controller:
-            audio_controller.play_sound("collision_rock") # A MODIFIER
+            audio_controller.play_sound("collision_rock")
                 
-        # Désactivation de l'item
+        self.is_active = False
         self.to_remove = True
+
+    def lancer(self, player):
+        """ Initialise la trajectoire, la vitesse et la position devant le joueur """
+        self.owner = player
+        self.angle = player.car.angle
+        
+        # Vitesse de la carapace (vitesse du kart + bonus)
+        car_speed = player.car.calcul_vitesse_abs()
+        self.speed = max(6.0, car_speed + 2.0)
+
+        # Calcul du vecteur direction selon l'angle du kart
+        angle_rad = math.radians(self.angle)
+        self.dir_x = math.sin(angle_rad)
+        self.dir_y = math.cos(angle_rad)
+
+        # Point d'apparition devant le kart 
+        dist = 40
+        self.x = player.car.x + dist * self.dir_x
+        self.y = player.car.y + dist * self.dir_y
+
+        # Placement immédiat du rect au point de spawn
+        self.rect.center = (int(self.x), int(self.y))
 
     def use(self, player, audio_controller=None):
         if audio_controller:
-            audio_controller.play_sound("drop_greenshell")
+            audio_controller.play_sound("drop_greenshell") # Effet sonore A MODIFIER
+
+        shell = GreenShell()
+        # Configuration tir
+        shell.lancer(player)
+        return shell 
 
 class BlueShell(Item):
     def __init__(self, x: float = 0, y: float = 0, track_size: int = 32, icon_size: int = 64):
