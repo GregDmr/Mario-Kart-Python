@@ -278,8 +278,18 @@ class Car:
         self.tire_mark_list.append(tire_mark)
 
     def big_hit(self):
+        """ Effet fake itembox et carapace verte / bleue """
         self.vx = 0
         self.vy = 0
 
+    def slide(self):
+        """ Effet glissage pour banane, flaque d'huile"""
+        pass
 
+    def boost(self):
+        """ Effet accélération champignon / boostpad"""
+        pass
+
+    def special_effect(self):
+        """ Effet spécial pour l'étoile, un peu plus rapide et peut être rendre la voiture plsu maniable"""
     

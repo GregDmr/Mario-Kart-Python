@@ -63,7 +63,7 @@ class ItemBox(Item):
 
     def collision(self, player=None, audio_controller=None) -> None:
         """
-        Gestion collision entre itembox et kart uniquement (rajouter collision avec greenshell par exemple pour faire disparaitre le cube)
+        Gestion collision entre itembox et kart uniquement (A FAIRE : rajouter collision avec greenshell par exemple pour faire disparaitre le cube)
         """
         # On ignore la collision si cube inactif
         if not self.is_active:
@@ -117,7 +117,7 @@ class Mushroom(Item):
         self.icon = pygame.transform.scale(self.image, (icon_size, icon_size))
 
     def collision(self, player, audio_controller=None) -> None:
-        """Un champignon en inventaire n'a pas de collision physique au sol. A implémenter ensuite"""
+        # Pas de collision prévue pour l'instant pour cette item 
         pass
 
     def use(self, player, audio_controller=None):
@@ -136,8 +136,16 @@ class Fake_ItemBox(Item):
         # Redimensionnement de l'icone pour le HUD
         self.icon = pygame.transform.scale(self.image, (icon_size, icon_size))
 
-    def collision(self, car, audio_controller=None):
-        pass
+    def collision(self, player, audio_controller=None):
+        # Activation de l'effet sur la voiture du joueur
+        player.car.big_hit()
+
+        # Bruitage du choc
+        if audio_controller:
+            audio_controller.play_sound("collision_rock") # A MODIFIER
+
+        # Désactivation de l'item
+        self.to_remove = True
 
     def use(self, player, audio_controller=None): 
         if audio_controller:
@@ -161,8 +169,16 @@ class Banana(Item):
         # Redimensionnement de l'icone pour le HUD
         self.icon = pygame.transform.scale(self.image, (icon_size, icon_size))
 
-    def collision(self, car, audio_controller=None):
-        pass
+    def collision(self, player, audio_controller=None):
+        # Activation de l'effet sur la voiture du joueur
+        player.car.slide()
+        
+        # Bruitage du choc
+        if audio_controller:
+            audio_controller.play_sound("collision_rock") # A MODIFIER
+        
+        # Désactivation de l'item
+        self.to_remove = True
 
     def use(self, player, audio_controller=None):
         if audio_controller:
@@ -184,8 +200,17 @@ class GreenShell(Item):
         # Redimensionnement de l'icone pour le HUD
         self.icon = pygame.transform.scale(self.image, (icon_size, icon_size))
 
-    def collision(self, car, audio_controller=None):
-        pass
+    def collision(self, player, audio_controller=None):
+        """ A FAIRE : implémenter la collision avec les murs car item mobile"""
+        # Activation de l'effet sur la voiture du joueur
+        player.car.big_hit()
+                
+        # Bruitage du choc
+        if audio_controller:
+            audio_controller.play_sound("collision_rock") # A MODIFIER
+                
+        # Désactivation de l'item
+        self.to_remove = True
 
     def use(self, player, audio_controller=None):
         if audio_controller:
@@ -198,8 +223,17 @@ class BlueShell(Item):
         # Redimensionnement de l'icone pour le HUD
         self.icon = pygame.transform.scale(self.image, (icon_size, icon_size))
 
-    def collision(self, car, audio_controller=None):
-        pass
+    def collision(self, player, audio_controller=None):
+        """ A FAIRE : Activer la collision uniquement si on touche le joueur, ignore collision avec les murs car objet volant"""
+        # Activation de l'effet sur la voiture du joueur
+        player.car.big_hit()
+                
+        # Bruitage du choc
+        if audio_controller:
+            audio_controller.play_sound("collision_rock") # A MODIFIER
+                
+        # Désactivation de l'item
+        self.to_remove = True
 
     def use(self, player, audio_controller=None):
         if audio_controller:
@@ -212,7 +246,8 @@ class Star(Item):
         # Redimensionnement de l'icone pour le HUD
         self.icon = pygame.transform.scale(self.image, (icon_size, icon_size))
 
-    def collision(self, car, audio_controller=None):
+    def collision(self, player, audio_controller=None):
+        # Pas de collision prévue pour cette item car jamais sur le circuit directement, active un état spécial pour le joueur
         pass
 
     def use(self, player, audio_controller=None):
