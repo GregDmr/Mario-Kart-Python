@@ -8,8 +8,6 @@ from pygame.image import load
 from pygame.transform import scale
 from model.item import ItemBox
 
-START_POSITIONS = [(200, 200, 0.0), (240, 200, 0.0)] #(colonne, ligne, angle), provisoire avant les blocs de départ
-
 class GameModel:
     """ Représentation du modèle global du jeu """
     def __init__(self):

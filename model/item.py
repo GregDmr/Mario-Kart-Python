@@ -92,11 +92,11 @@ class ItemBox(Item):
         """ Gestion du don d'objet au joueur"""
         # Test en donnant obligatoirement un champignon (A MODIFIER)
         if player.item is None:
-            available_items = [Mushroom, Fake_ItemBox, Banana, GreenShell, BlueShell, Star]
+            available_items = [Mushroom, Fake_ItemBox, Banana, GreenShell, BlueShell, Star, Bobomb]
             # Choix équiprobable entre les items de la liste 
             item_class = random.choice(available_items)
             # Attribution de l'item au joueur
-            player.item = item_class()
+            player.item = Bobomb() # item_class()
 
     def update(self) -> None:
         """
@@ -230,7 +230,7 @@ class BlueShell(Item):
                 
         # Bruitage du choc
         if audio_controller:
-            audio_controller.play_sound("collision_rock") # A MODIFIER
+            audio_controller.play_sound("collision_wood") # A MODIFIER
                 
         # Désactivation de l'item
         self.to_remove = True
@@ -253,3 +253,35 @@ class Star(Item):
     def use(self, player, audio_controller=None):
         if audio_controller:
             audio_controller.play_sound("use_star")
+
+class Bobomb(Item):
+    def __init__(self, x: float = 0, y: float = 0, track_size: int = 32, icon_size: int = 64):
+        super().__init__(x, y, size=track_size, image_path=c.SPRITE_BOBOMB)
+        self.name = "Bobomb"
+        # Redimensionnement de l'icone pour le HUD
+        self.icon = pygame.transform.scale(self.image, (icon_size, icon_size))
+        
+    def collision(self, player, audio_controller=None):
+        # Activation de l'effet sur la voiture du joueur
+        player.car.big_hit()
+            
+        # Bruitage du choc
+        if audio_controller:
+            audio_controller.play_sound("explosion_bomb")  
+            
+        # Désactivation de l'item
+        self.to_remove = True
+        
+    def use(self, player, audio_controller=None):
+        """ Ajouter timer pour explosion"""
+        if audio_controller:
+            audio_controller.play_sound("drop_fake_itembox")
+            
+        # Calcul des coordonnées ou on va drop la bombe
+        dist = 40
+        angle_rad = math.radians(player.car.angle)
+        drop_x = player.car.x - dist * math.sin(angle_rad)
+        drop_y = player.car.y + dist * math.cos(angle_rad)
+            
+        # On renvoie l'instance au GameModel
+        return Bobomb(x=drop_x, y=drop_y)
