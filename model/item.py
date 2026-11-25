@@ -155,7 +155,7 @@ class Fake_ItemBox(Item):
         dist = 40 # A ajuster plus tard suivant la taille de la voiture
         angle_rad = math.radians(player.car.angle)
         drop_x = player.car.x - dist * math.sin(angle_rad)
-        drop_y = player.car.y + dist * math.cos(angle_rad)
+        drop_y = player.car.y - dist * math.cos(angle_rad)
         
         # On renvoie l'instance au GameModel
         return Fake_ItemBox(x=drop_x, y=drop_y)
@@ -188,7 +188,7 @@ class Banana(Item):
         dist = 40
         angle_rad = math.radians(player.car.angle)
         drop_x = player.car.x - dist * math.sin(angle_rad)
-        drop_y = player.car.y + dist * math.cos(angle_rad)
+        drop_y = player.car.y - dist * math.cos(angle_rad)
 
         # On renvoie l'instance au GameModel
         return Banana(x=drop_x, y=drop_y)
@@ -341,7 +341,7 @@ class Bobomb(Item):
         dist = 40
         angle_rad = math.radians(player.car.angle)
         drop_x = player.car.x - dist * math.sin(angle_rad)
-        drop_y = player.car.y + dist * math.cos(angle_rad)
+        drop_y = player.car.y - dist * math.cos(angle_rad)
             
         # On renvoie l'instance au GameModel
         return Bobomb(x=drop_x, y=drop_y)
