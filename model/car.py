@@ -195,7 +195,7 @@ class Car:
                 if tile.road_type == 2 :
                     self.trigger_colision(corner) 
                 if tile.road_type == 4 :
-                    self.angle += 0.02*self.vx * (-0.5+random.random()) #vibration sur les vibreurs, magnitude fine tune et hard codé
+                    self.angle += 0.2*self.vx * (-0.5+random.random()) #vibration sur les vibreurs, magnitude fine tune et hard codé
 
     def compute_accelerations(self):
         
@@ -207,14 +207,14 @@ class Car:
         fx_car = 0
         fy_car = 0
         mom_tot = 0
-        rolling_res_tot = 0
+        static_friction_tot = 0
         for tire in self.list_tires:
-            fx,fy,tire_mark,rol_res = tire.compute_forces()
-            
+            fx,fy,tire_mark,static_friction = tire.compute_forces()
+            static_friction_tot += static_friction
+
             if tire.offset_length>0:
                 fx_car = fx * math.cos(self.steering_angle) - fy*math.sin(self.steering_angle)
                 fy_car = fx * math.sin(self.steering_angle) + fy*math.cos(self.steering_angle)
-                rolling_res_tot += rol_res
             else :
                 fx_car = fx
                 fy_car = fy
@@ -224,12 +224,12 @@ class Car:
             fx_tot += fx_car
             fy_tot +=fy_car
             mom_tot += tire.offset_length * fy_car - tire.offset_width * fx_car
-        fx_tot -= self.vx *abs(self.vx) * rolling_res_tot + 0.5 * self.vx #friction du a l'air (vitesse carrée) et linéaire (vitesse lineaire)
-        rolling_res_tot = rolling_res_tot/4
+        fx_tot -= self.vx *abs(self.vx) * c.AIR_RESISTANCE + c.ROLLING_RESISTANCE * self.vx #friction due a l'air (vitesse carrée) et au roulement (vitesse lineaire)
+        static_friction = static_friction_tot / len(self.list_tires) #moyenne des pneus, selon le sol sous chacun
         if self.vx >= 0.2:
-            fx_tot -= 30
+            fx_tot -= static_friction
         elif self.vx <= -0.2:
-            fx_tot += 30 #resistance de roulement 
+            fx_tot += static_friction #force constante du sol, pas appliquée à l'arrêt pour ne pas faire vibrer la voiture
 
         self.fz_ax = fx_tot/self.mass #accélérations réelles du corps, gardées pour le calcul de Fz à la frame suivante
         self.fz_ay = fy_tot/self.mass

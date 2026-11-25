@@ -7,6 +7,7 @@ import pygame
 from constants import GRID_COLS, GRID_ROWS, TILE_SIZE
 
 references = [(48, 48, 48), (0, 255, 0), (127, 51, 0), (0,255,255), (255,0,0), (255,216,0)]      #route, herbe, mur, glace, vibreur, sable
+WALL_MAX_ERROR = 100 # erreur max (somme des carrés) pour qu'une tuile soit classée mur
 
 def convert_track(chosen_track_path : str) -> list[list[int]]:
     """Convertit une image de circuit en matrice d'ID de tuiles.
@@ -53,6 +54,8 @@ def convert_track(chosen_track_path : str) -> list[list[int]]:
                 error_green = (g-average_color[1])**2
                 error_blue = (b-average_color[2])**2
                 error_tot = error_blue + error_green + error_red
+                if i == 2 and error_tot > WALL_MAX_ERROR:
+                    continue # un mélange de couleurs (bord de vibreur, sable...) ne doit pas devenir un mur
                 if error_tot < best_error:
                     best_match_id = i
                     best_error = error_tot

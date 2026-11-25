@@ -26,10 +26,10 @@ class Tire :
         tile = self.get_tile()
         if tile is not None:
             friction_coef = c.FRICTION_COEFFS[tile.road_type]
-            rolling_res = c.ROLLING_RESISTANCE[tile.road_type]
+            static_friction = c.STATIC_FRICTION[tile.road_type]
         else :
             friction_coef = c.FRICTION_COEFFS[1]
-            rolling_res = c.ROLLING_RESISTANCE[1]
+            static_friction = c.STATIC_FRICTION[1]
         self.compute_Fz()
 
         self.contact_point_vel() 
@@ -43,7 +43,7 @@ class Tire :
                         
         
         
-        return (Fx,Fy, tire_mark, rolling_res)
+        return (Fx,Fy, tire_mark, static_friction)
 
 
     def generate_mark(self,current_slip):
