@@ -74,13 +74,15 @@ class GameModel:
         self.cars.clear()
 
         # On parcourt les positions définies dans la configuration du circuit
+        #temp for testing :
+        CHOSEN_CARS = [1,3]
         for index, spawn in enumerate(self.circuit.starting_positions):
             x = spawn["x"]
             y = spawn["y"]
             angle = spawn.get("angle", 90)
 
             # Instanciation de la voiture et du joueur associés
-            car = Car(self.circuit, x, y, index, angle)
+            car = Car(self.circuit, x, y, CHOSEN_CARS[index], angle)
             player = Player(index, car)
 
             self.cars.append(car)

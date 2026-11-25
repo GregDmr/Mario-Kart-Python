@@ -150,9 +150,11 @@ class Car:
     def update_position(self) -> None:
         """ Met à jour la position de la voiture en fonction de sa vitesse"""
         self.tire_mark_list = [m for m in self.tire_mark_list if m.lifespan > 0] #itere dans la liste, mais ne valide pas la classe si lifespan =0 ou moins
-        
-        self.compute_speeds(self.compute_accelerations())
+        ax,ay,omegad = self.compute_accelerations()
+        #ICI UNE FONCTION QUI OVERWRITE LES ACCELERATIONS POUR LES ITEMS (PLUS SOFT QUE VX)
+        self.compute_speeds(ax,ay,omegad)
         dt = 1 / c.FPS
+        ## AJOUTE LE STUFF POUR LES ITEMS ICI, TU OVERWRITE VX / VY / OMEGAD, EN VERIFIANT SI ON EST AFFECTE PAR UN ITEM
         self.angle += math.degrees(self.omegad) * dt #omega en rad/s, l'angle reste en degrés
         self.angle = self.angle%360
         #vitesses en m/s : conversion en pixels avec ppm
@@ -274,3 +276,10 @@ class Car:
 
     def render_tire_mark(self,tire_mark):
         self.tire_mark_list.append(tire_mark)
+
+    def big_hit(self):
+        self.vx = 0
+        self.vy = 0
+
+
+    
