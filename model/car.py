@@ -80,6 +80,9 @@ class Car:
         rect.center = (centre_x, centre_y)  # On positionne le centre ici !
         return rect
 
+    def calcul_vitesse_abs(self):
+        """ Renvoie la vitesse absolue de la voiture qui sert pour l'envoie des items """
+        return math.hypot(self.vx, self.vy)
 
     def compute_new_metrics(self, input_dico):
 
@@ -308,6 +311,7 @@ class Car:
         self.tire_mark_list.append(tire_mark)
 
     def big_hit(self):
+        """ Effet fake itembox et carapace verte / bleue """
         self.vx = 0
         self.vy = 0
 
@@ -362,5 +366,14 @@ class Car:
 
 
 
+    def slide(self):
+        """ Effet glissage pour banane, flaque d'huile"""
+        pass
 
+    def boost(self):
+        """ Effet accélération champignon / boostpad"""
+        pass
+
+    def special_effect(self):
+        """ Effet spécial pour l'étoile, un peu plus rapide et peut être rendre la voiture plsu maniable"""
     
