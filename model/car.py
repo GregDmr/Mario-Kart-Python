@@ -61,6 +61,16 @@ class Car:
             Tire(self,-side_offset,rear_offset,propulsion),#RR
             Tire(self,side_offset,rear_offset,propulsion)] #RL
 
+        #sondes de collision pour ne pas recalculer a chaque trigger_colision
+        self.L_probe_px = 15
+        self.N_probes = 24
+        self.list_angles = []
+        self.normal_vec = []
+        for k in range(self.N_probes):
+            angle = k*(360/self.N_probes)
+            self.list_angles.append(angle)
+            self.normal_vec.append((sind(angle), -cosd(angle)))
+
     def get_rect(self) -> pygame.Rect:
         """Calcule et renvoie le rectangle de collision pour la voiture."""
         centre_x = round(self.x - sind(self.angle) * self.center_grav_x * ppm)
@@ -158,11 +168,31 @@ class Car:
         self.compute_speeds(accels)
         dt = 1 / c.FPS
         ## AJOUTE LE STUFF POUR LES ITEMS ICI, TU OVERWRITE VX / VY / OMEGAD, EN VERIFIANT SI ON EST AFFECTE PAR UN ITEM
+        
+        
         self.angle += math.degrees(self.omegad) * dt #omega en rad/s, l'angle reste en degrés
         self.angle = self.angle%360
         #vitesses en m/s : conversion en pixels avec ppm
         self.x += (self.vx * sind(self.angle) + self.vy * cosd(self.angle)) * ppm * dt
         self.y += (self.vx * cosd(self.angle) - self.vy * sind(self.angle)) * ppm * dt
+        
+        #coins de la carrosserie en pixels, mesurés depuis le CG (comme pour les pneus)
+        front = self.car_height/2 - self.center_grav_x
+        rear = -(self.car_height/2 + self.center_grav_x)
+        side = self.car_width/2
+        sin_a = sind(self.angle)
+        cos_a = cosd(self.angle)
+        cornerFR = (self.x - ppm*side*cos_a + ppm*front*sin_a, self.y + ppm*side*sin_a + ppm*front*cos_a)
+        cornerFL = (self.x + ppm*side*cos_a + ppm*front*sin_a, self.y - ppm*side*sin_a + ppm*front*cos_a)
+        cornerRR = (self.x - ppm*side*cos_a + ppm*rear*sin_a, self.y + ppm*side*sin_a + ppm*rear*cos_a)
+        cornerRL = (self.x + ppm*side*cos_a + ppm*rear*sin_a, self.y - ppm*side*sin_a + ppm*rear*cos_a)
+        corner_list = [cornerFR,cornerFL,cornerRR,cornerRL]
+        
+        for corner in corner_list :
+            tile = self.circuit.get_tile_at_pixel(corner[0],corner[1])
+            if tile is not None :
+                if tile.road_type == 2 :
+                    self.trigger_colision(corner) 
 
     def compute_accelerations(self):
         
@@ -284,6 +314,57 @@ class Car:
         """ Effet fake itembox et carapace verte / bleue """
         self.vx = 0
         self.vy = 0
+
+    def trigger_colision(self,cornerTuple):
+        colisionX = cornerTuple[0]
+        colisionY = cornerTuple[1]
+        x_coords = []
+        y_coords = []
+
+        for angle in self.list_angles :
+            x_coords.append(colisionX + self.L_probe_px * sind(angle))
+            y_coords.append(colisionY + self.L_probe_px * - cosd(angle))
+        x_final = 0
+        y_final = 0
+        for i in range(self.N_probes):
+            tile = self.circuit.get_tile_at_pixel(x_coords[i],y_coords[i])
+            if tile is not None :
+                if tile.road_type != 2:
+                   x_final+= self.normal_vec[i][0]
+                   y_final += self.normal_vec[i][1]
+        length = math.sqrt(x_final**2 + y_final**2)
+        
+        if length > 1e-6 : #normaliser
+            nx = x_final / length
+            ny = y_final / length
+            nx_car = nx*sind(self.angle) + ny*cosd(self.angle)
+            ny_car = nx*cosd(self.angle) - ny*sind(self.angle)
+        else :
+            # fallback : uniquement si le mur est particulier, très fin , toutes les probes touchent le vide ou le mur
+            speed = math.sqrt(self.vx**2 + self.vy**2)
+            if speed < 1e-6 :
+                return
+            nx_car = -self.vx / speed
+            ny_car = -self.vy / speed
+
+        bounce =0.3
+        mu =0.1
+        tx = -ny_car
+        ty = nx_car
+        vn = self.vx*nx_car + self.vy*ny_car      # vitesse dans la direction normale, imaginer, a quel point ma vitesse en X match avec la normale au mur, idem pour Y, et additionner
+        vt = self.vx*tx + self.vy*ty              # vitesse le long du mur, idem en tangeante au mur
+        if vn < 0 :
+            vn = -bounce * vn                          # rebond
+            vt = (1 - mu) * vt                    # frottement
+            self.vx = vn*nx_car + vt*tx
+            self.vy = vn*ny_car + vt*ty
+        
+        
+        
+       
+
+
+
 
     def slide(self):
         """ Effet glissage pour banane, flaque d'huile"""
