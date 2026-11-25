@@ -63,7 +63,7 @@ class Car:
 
         #sondes de collision pour ne pas recalculer a chaque trigger_colision
         self.L_probe_px = 15
-        self.N_probes = 12
+        self.N_probes = 24
         self.list_angles = []
         self.normal_vec = []
         for k in range(self.N_probes):
