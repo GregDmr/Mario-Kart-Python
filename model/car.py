@@ -6,6 +6,7 @@ from constants import PIXEL_PER_METER as ppm
 from model.tire import Tire
 from tools.degree_trig import sind, cosd
 from model.circuit import Circuit
+import random
 class Car:
     """Voiture : physique, pneus, traces de pneus et sprite."""
 
@@ -193,6 +194,8 @@ class Car:
             if tile is not None :
                 if tile.road_type == 2 :
                     self.trigger_colision(corner) 
+                if tile.road_type == 4 :
+                    self.angle += 0.02*self.vx * (-0.5+random.random()) #vibration sur les vibreurs, magnitude fine tune et hard codé
 
     def compute_accelerations(self):
         
@@ -204,12 +207,14 @@ class Car:
         fx_car = 0
         fy_car = 0
         mom_tot = 0
-        
+        rolling_res_tot = 0
         for tire in self.list_tires:
-            fx,fy,tire_mark = tire.compute_forces()
+            fx,fy,tire_mark,rol_res = tire.compute_forces()
+            
             if tire.offset_length>0:
                 fx_car = fx * math.cos(self.steering_angle) - fy*math.sin(self.steering_angle)
                 fy_car = fx * math.sin(self.steering_angle) + fy*math.cos(self.steering_angle)
+                rolling_res_tot += rol_res
             else :
                 fx_car = fx
                 fy_car = fy
@@ -218,10 +223,9 @@ class Car:
                 self.render_tire_mark(tire_mark) # dans compute acceleration puisque le derapage du pneu est directement lié
             fx_tot += fx_car
             fy_tot +=fy_car
-
             mom_tot += tire.offset_length * fy_car - tire.offset_width * fx_car
-        fx_tot -= self.vx *abs(self.vx) * 0.6 + 0.5 * self.vx #friction du a l'air (vitesse carrée) et linéaire (vitesse lineaire)
-        
+        fx_tot -= self.vx *abs(self.vx) * rolling_res_tot + 0.5 * self.vx #friction du a l'air (vitesse carrée) et linéaire (vitesse lineaire)
+        rolling_res_tot = rolling_res_tot/4
         if self.vx >= 0.2:
             fx_tot -= 30
         elif self.vx <= -0.2:

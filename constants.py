@@ -16,7 +16,9 @@ WINDOW_HEIGHT = TILE_SIZE * GRID_ROWS
 
 #Propriétés des ROAD_TILES
 
-FRICTION_COEFFS = [1.8 ,0.75,0,0.4] #route, herbe, mur, glace
+FRICTION_COEFFS = [1.8 ,1.1,1.5,0.6,1.4,0.8] #route, herbe, mur, glace, vibreur, sable
+#coefficient de résistance au roulement (sans unité), force = coeff * masse * g. Même ordre que FRICTION_COEFFS
+ROLLING_RESISTANCE = [0.6,1.4,1,0.2,1,3] #route, herbe, mur, glace, vibreur, sable
 
 #Coefficients de la Magic Tire Equation
 PACEJKA_B_LONG = 10
