@@ -8,8 +8,6 @@ from pygame.image import load
 from pygame.transform import scale
 from model.item import ItemBox
 
-START_POSITIONS = [(200, 200, 0.0), (240, 200, 0.0)] #(colonne, ligne, angle), provisoire avant les blocs de départ
-
 class GameModel:
     """ Représentation du modèle global du jeu """
     def __init__(self):
@@ -20,7 +18,7 @@ class GameModel:
         self.cars: list[Car] = [] # Voitures de la course en cours
         #copie : modifier une touche ne doit pas modifier DEFAULT_KEYBINDS
         self.keybinds = [{action: list(keys) for action, keys in player_keys.items()} for player_keys in DEFAULT_KEYBINDS]
-        self.items = [] # Liste des cubes présents sur la piste
+        self.items = [] # Liste des items présents sur la piste
         self.pending_track: str | None = None  #Circuit choisi, chargé pendant l'écran de chargement
 
         # Un menu par état qui en a un
@@ -98,7 +96,7 @@ class GameModel:
         for player in self.players:
             player.car.update_position()
 
-        # Gestion des objets (réapparition + collisions)
+        # Gestion des objets (réapparition + collisions + objets drop au sol)
         for item in self.items:
             # Vérifie si le délai de 3 secondes est écoulé pour faire réapparaître l'objet
             item.update()
@@ -108,9 +106,16 @@ class GameModel:
                 if item.is_active and player.car.get_rect().colliderect(item.rect):
                     item.collision(player, audio_controller)
 
+        # Nettoyage de la liste d'items suivant le booléen to_remove
+        self.items = [item for item in self.items if not item.to_remove]
+
     def use_item(self, player_index: int, audio_controller=None) -> None:
         """ Le joueur utilise son objet (à compléter avec les objets) """
         player = self.players[player_index]
         if player.item is None:
             return
-        player.use_item(audio_controller)
+
+        # On récupère l'item utilisé par le jour pour savoir si on doit le déposer sur la piste
+        drop_item = player.use_item(audio_controller)
+        if drop_item is not None:
+            self.items.append(drop_item)
