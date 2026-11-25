@@ -28,8 +28,10 @@ class Car:
         self.max_torque = c.MAX_ENGINE_TORQUE[chosen_car]
         self.braking_torque = c.MAX_BRAKING_TORQUE[chosen_car] #attention meme ordre de grandeur que engine torque (plus grand car freinage, mais le calcul pour la force est le meme)
         self.izz = c.CAR_IZZ[chosen_car]
+        self.tire_radius = c.TIRE_RADIUS[chosen_car]
+        self.wheel_inertia = c.WHEEL_INERTIA[chosen_car]
         propulsion = c.RWD[chosen_car]
-        self.final_drive = 4
+        self.final_drive = c.FINAL_DRIVE[chosen_car]
         self.engine_speed_max = 750 #les deux valeurs a equilibrer en essais.
         # Conversion des coordonnées de la grille en pixels
         self.x = start_col * c.TILE_SIZE + c.TILE_SIZE // 2

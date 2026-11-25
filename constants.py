@@ -9,7 +9,7 @@ GRID_ROWS = 68*12
 
 GRAVITY = 9.81 #m/s²
 
-PIXEL_PER_METER = 10#super important a définir plus tard, permet de lier la physique du modèle car avec le rendu 
+PIXEL_PER_METER = 20#super important a définir plus tard, permet de lier la physique du modèle car avec le rendu 
 
 WINDOW_WIDTH = TILE_SIZE * GRID_COLS
 WINDOW_HEIGHT = TILE_SIZE * GRID_ROWS
@@ -48,25 +48,29 @@ COLOR_PANEL_BORDER = (60, 60, 100)
 COLOR_HINT = (150, 150, 170)
 COLOR_HUD = (255, 0, 0)
 
-#Charactéristiques des voitures, placeholder pour le moment
-RWD = [1,1] #bool, true si propulsion, false si traction
-STEERING_VELOCITY = [0.1,0.15] #Vitesse de rotation du volant, valeur sans unité
-STEERING_RANGE = [0.5,1.1] #angle max de rotation des roues , RADIAN
+#Charactéristiques des voitures : [voiture test jaune, DK, WL, YO]
+#voiture test = petite sportive, karts = karts haut de gamme (rapport poids/puissance élevé, CG bas, empattement court)
+RWD = [1,1,1,1] #bool, true si propulsion, false si traction
+STEERING_VELOCITY = [0.1,0.12,0.14,0.16] #Vitesse de rotation du volant, valeur sans unité
+STEERING_RANGE = [0.6,0.5,0.5,0.5] #angle max de rotation des roues , RADIAN
 STEERING_SPEED_REF = 12 #vitesse (m/s) à laquelle le braquage est divisé par 2
-WHEEL_BASE = [4,4] #entraxe des roues longitudinal, METRE
-WHEEL_TRACK = [1.9,1.9] #entraxe des roues latéral, METRE
-MAX_ENGINE_TORQUE = [200,200] #couple max du moteur , N * m
-MAX_BRAKING_TORQUE = [800,800]
-BRAKE_BIAS_FRONT = 0.62 #part du freinage sur l'essieu avant (0.5 = répartition égale)
-CENTER_GRAVITY_Z = [0.3,0.3] #hauteur du CG en m
-CENTER_GRAVITY_X = [0.2,0.2] #position longitudinale du CG a partir du centre geométrique de la voiture (pos ou neg)
-MASS = [600,600]  #masse en kg
-CAR_WIDTH = [2,2] #m
-CAR_HEIGHT = [4.7,4.7]#m
-WHEEL_LENGTH = [0.6,0.6] #m, taille de la roue vue de dessus, dans le sens de roulage
-WHEEL_WIDTH = [0.3,0.3] #m
-CAR_IZZ = [600,600] #KG * m²
-CAR_SPRITE = ["01_yellow_test.png", "01_yellow_test.png"]
+WHEEL_BASE = [2.8,1.0,1.0,1.0] #entraxe des roues longitudinal, METRE
+WHEEL_TRACK = [1.65,1.15,1.15,1.15] #entraxe des roues latéral, METRE
+MAX_ENGINE_TORQUE = [250,125,117,106] #couple max du moteur , N * m
+MAX_BRAKING_TORQUE = [950,275,255,230]
+BRAKE_BIAS_FRONT = 0.8 #part du freinage sur l'essieu avant (0.5 = répartition égale), élevé pour que l'arrière ne bloque pas en premier
+CENTER_GRAVITY_Z = [0.45,0.2,0.2,0.2] #hauteur du CG en m
+CENTER_GRAVITY_X = [0.05,-0.1,-0.1,-0.12] #position longitudinale du CG a partir du centre geométrique de la voiture (pos ou neg)
+MASS = [900,195,180,165]  #masse en kg (pilote compris pour les karts)
+CAR_WIDTH = [2,1.5,1.5,1.5] #m
+CAR_HEIGHT = [4.7,2,2,2]#m
+WHEEL_LENGTH = [0.65,0.38,0.38,0.38] #m, taille de la roue vue de dessus, dans le sens de roulage
+WHEEL_WIDTH = [0.25,0.25,0.25,0.25] #m
+TIRE_RADIUS = [0.3,0.15,0.15,0.15] #m, rayon de roulement (sert au glissement et au régime moteur)
+WHEEL_INERTIA = [1.2,0.3,0.3,0.3] #KG * m², inertie d'une roue en rotation
+FINAL_DRIVE = [4,2,2,2] #rapport de transmission moteur -> roues, proportionnel au rayon pour garder la même vitesse max et la même force aux roues
+CAR_IZZ = [1100,72,68,60] #KG * m²
+CAR_SPRITE = ["01_yellow_test.png", "02_DK.png", "03_WL.png", "04_YO.png"]
 CAR_SPRITES_DIRECTORY = "assets/sprites/cars"
 
 #Touches par défaut de chaque joueur (action -> touches)

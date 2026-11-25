@@ -11,13 +11,13 @@ class Tire :
         self.offset_width = offset_width
         self.offset_length = offset_length
         self.drived = drived
-        self.tire_radius = 0.3
+        self.tire_radius = car.tire_radius
         #charge au repos : part du poids opposée à l'essieu du pneu, partagée entre les 2 pneus de l'essieu
         self.Fz = car.mass * c.GRAVITY * (car.wheelbase - abs(offset_length)) / (2 * car.wheelbase)
         self.Fz_static = self.Fz #charge nominale, ne change jamais
         self.rot_speed_tire = 0.0
         self.rot_speed_car = 0.0
-        self.inertia = 1.2
+        self.inertia = car.wheel_inertia
         self.def_x = 0.0 #déformation du patch de contact (m), gardée d'une frame à l'autre
         self.def_y = 0.0
         self.last_mark_gen = (0,0)
