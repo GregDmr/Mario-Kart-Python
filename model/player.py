@@ -19,6 +19,8 @@ class Player:
         # Vérification si le joueur a un objet
         if self.item is not None:
             # Utilisation de la méthode use de l'item du joueur
-            self.item.use(self, audio_controller)
+            drop_item = self.item.use(self, audio_controller)
             # On vide l'inventaire du joueur
             self.item = None
+            # On retourne l'objet drop pour le game_model
+            return drop_item

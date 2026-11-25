@@ -3,6 +3,7 @@ import pygame
 from controller.audio_controller import AudioController
 import constants as c
 from model.player import Player
+import math
 
 class Item:
     """
@@ -142,6 +143,15 @@ class Fake_ItemBox(Item):
         if audio_controller:
             audio_controller.play_sound("drop_fake_itembox")
 
+        # Calcul des coordonnées ou on va drop le fake itembox
+        dist = 40 # A ajuster plus tard suivant la taille de la voiture
+        angle_rad = math.radians(player.car.angle)
+        drop_x = player.car.x - dist * math.sin(angle_rad)
+        drop_y = player.car.y + dist * math.cos(angle_rad)
+        
+        # On renvoie l'instance au GameModel
+        return Fake_ItemBox(x=drop_x, y=drop_y)
+
 
 
 class Banana(Item):
@@ -157,6 +167,15 @@ class Banana(Item):
     def use(self, player, audio_controller=None):
         if audio_controller:
             audio_controller.play_sound("drop_banana")
+
+        # Calcul des coordonnées ou on va drop la banane
+        dist = 40
+        angle_rad = math.radians(player.car.angle)
+        drop_x = player.car.x - dist * math.sin(angle_rad)
+        drop_y = player.car.y + dist * math.cos(angle_rad)
+
+        # On renvoie l'instance au GameModel
+        return Banana(x=drop_x, y=drop_y)
 
 class GreenShell(Item):
     def __init__(self, x: float = 0, y: float = 0, track_size: int = 32, icon_size: int = 64):
@@ -199,4 +218,3 @@ class Star(Item):
     def use(self, player, audio_controller=None):
         if audio_controller:
             audio_controller.play_sound("use_star")
-    
