@@ -18,7 +18,7 @@ WINDOW_HEIGHT = TILE_SIZE * GRID_ROWS
 
 FRICTION_COEFFS = [1.9 ,1.6,1.5,0.6,1.4,1.5] #route, herbe, mur, glace, vibreur, sable
 #facteur de résistance de chaque sol (route = 1), multiplie les 3 termes de résistance ci-dessous. Même ordre que FRICTION_COEFFS
-ROLLING_RESISTANCE = [1,3,35,0.5,2,40] #route, herbe, mur, glace, vibreur, sable
+ROLLING_RESISTANCE = [1,3,30,0.5,2,35] #route, herbe, mur, glace, vibreur, sable
 #résistance sur route (facteur 1) : force = const + linéaire * v + quadratique * v²
 RESISTANCE_CONST = 35 #N, force constante qui s'oppose au roulement
 RESISTANCE_LINEAR = 0.3 #N / (m/s)

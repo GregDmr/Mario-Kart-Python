@@ -48,6 +48,7 @@ class Car:
         self.steering_angle : float = 0.0 #radians
         self.torque_multiplier : float = 0.0 #entre -1 et 1
         self.desired_torque : float = 0.0 #N.m
+        
         # Génération du sprite visuel de base 
         self.sprite = self.build_sprite(chosen_car)
         self.tire_mark_list = []
@@ -71,7 +72,12 @@ class Car:
             angle = k*(360/self.N_probes)
             self.list_angles.append(angle)
             self.normal_vec.append((sind(angle), -cosd(angle)))
-
+        
+        # timers pour les objets
+        self.timer_big_hit = 0
+        self.timer_slide = 0
+        self.slide_wx = 0 #vitesse de la voiture dans le repère de la piste au moment de la banane
+        self.slide_wy = 0
     def get_rect(self) -> pygame.Rect:
         """Calcule et renvoie le rectangle de collision pour la voiture."""
         centre_x = round(self.x - sind(self.angle) * self.center_grav_x * ppm)
@@ -165,17 +171,24 @@ class Car:
         """ Met à jour la position de la voiture en fonction de sa vitesse"""
         self.tire_mark_list = [m for m in self.tire_mark_list if m.lifespan > 0] #itere dans la liste, mais ne valide pas la classe si lifespan =0 ou moins
         accels = self.compute_accelerations()
-        #ICI UNE FONCTION QUI OVERWRITE LES ACCELERATIONS POUR LES ITEMS (PLUS SOFT QUE VX)
+       
         self.compute_speeds(accels)
         dt = 1 / c.FPS
-        ## AJOUTE LE STUFF POUR LES ITEMS ICI, TU OVERWRITE VX / VY / OMEGAD, EN VERIFIANT SI ON EST AFFECTE PAR UN ITEM
         
-        
-        self.angle += math.degrees(self.omegad) * dt #omega en rad/s, l'angle reste en degrés
+        #colisions objets :
+        if self.timer_big_hit>0:
+            self.big_hit()
+        if self.timer_slide>0:
+            self.slide()
+
+        self.angle +=math.degrees(self.omegad) * dt #omega en rad/s, l'angle reste en degrés
         self.angle = self.angle%360
         #vitesses en m/s : conversion en pixels avec ppm
         self.x += (self.vx * sind(self.angle) + self.vy * cosd(self.angle)) * ppm * dt
         self.y += (self.vx * cosd(self.angle) - self.vy * sind(self.angle)) * ppm * dt
+
+        
+
         
         #coins de la carrosserie en pixels, mesurés depuis le CG (comme pour les pneus)
         front = self.car_height/2 - self.center_grav_x
@@ -325,10 +338,7 @@ class Car:
             tire.rot_speed_tire = 0.0  #sinon la roue relance la voiture
             tire.def_x = tire.def_y = 0.0
 
-    def big_hit(self):
-        """ Effet fake itembox et carapace verte / bleue """
-        self.vx = 0
-        self.vy = 0
+    
 
     def trigger_colision(self,cornerTuple):
         colisionX = cornerTuple[0]
@@ -374,16 +384,30 @@ class Car:
             self.vx = vn*nx_car + vt*tx
             self.vy = vn*ny_car + vt*ty
         
-        
-        
-       
-
-
-
-
+    def big_hit(self):
+        """ Effet fake itembox et carapace verte / bleue """
+        stun_duration = 60
+        if self.timer_big_hit == 0:
+            self.timer_big_hit = stun_duration
+        self.vx = 0
+        self.vy = 0
+        self.omegad = 6.28
+        self.timer_big_hit -=1
+      
     def slide(self):
-        """ Effet glissage pour banane, flaque d'huile"""
-        pass
+        """ Effet banane : la voiture tourne sur elle-même en gardant sa direction initiale """
+        slide_duration = 60
+        if self.timer_slide == 0:
+            self.timer_slide = slide_duration
+            #vitesse dans le repère de la piste, elle ne change plus pendant l'effet
+            self.slide_wx = 0.5*self.vx * sind(self.angle) + self.vy * cosd(self.angle)
+            self.slide_wy = 0.5 * self.vx * cosd(self.angle) - self.vy * sind(self.angle)
+        self.angle += 720 / slide_duration #2 tours sur toute la durée
+        #on ré-exprime la vitesse constante dans le repère de la voiture qui a tourné
+        self.vx = self.slide_wx * sind(self.angle) + self.slide_wy * cosd(self.angle)
+        self.vy = self.slide_wx * cosd(self.angle) - self.slide_wy * sind(self.angle)
+        self.omegad = 0
+        self.timer_slide -= 1  
 
     def boost(self):
         """ Effet accélération champignon / boostpad"""
