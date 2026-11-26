@@ -53,6 +53,7 @@ COLOR_PANEL = (30, 30, 50)
 COLOR_PANEL_BORDER = (60, 60, 100)
 COLOR_HINT = (150, 150, 170)
 COLOR_HUD = (255, 0, 0)
+SHOW_CHECKPOINTS = True  #contours des points de passage, pour les placer (False pour le rendu)
 
 #Charactéristiques des voitures : [voiture test jaune, DK, WL, YO]
 #voiture test = petite sportive, karts = karts haut de gamme (rapport poids/puissance élevé, CG bas, empattement court)

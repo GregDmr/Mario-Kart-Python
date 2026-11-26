@@ -2,7 +2,7 @@ import json
 import pygame
 from constants import (
     WINDOW_WIDTH, WINDOW_HEIGHT, TILE_SIZE,
-    COLOR_BG, COLOR_TEXT, COLOR_ACCENT, COLOR_PANEL, COLOR_PANEL_BORDER, COLOR_HINT, COLOR_HUD,
+    COLOR_BG, COLOR_TEXT, COLOR_ACCENT, COLOR_PANEL, COLOR_PANEL_BORDER, COLOR_HINT, COLOR_HUD, SHOW_CHECKPOINTS,
     GameState
 )
 from model.game_model import GameModel
@@ -124,6 +124,10 @@ class GameView:
         
         if model.circuit is None:
             return
+        if SHOW_CHECKPOINTS:
+            for checkpoint in model.circuit.checkpoints + [model.circuit.finish_line]:
+                pygame.draw.rect(self.screen, COLOR_ACCENT, checkpoint.rect, 2)
+
         #affichage des tire marks, avant la voiture pour qu'elles soient dessous
         for player in model.players:
             for tire_mark in player.car.tire_mark_list:

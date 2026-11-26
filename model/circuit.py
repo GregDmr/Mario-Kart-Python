@@ -4,6 +4,7 @@ import json
 import os
 from tools.track_converter import convert_track
 from model.item import ItemBox
+from model.checkpoint import Checkpoint
 
 
 class Circuit:
@@ -26,6 +27,11 @@ class Circuit:
             for box in config.get("item_boxes", [])
         ]
 
+        # Points de passage dans l'ordre, ligne d'arrivée et nombre de tours
+        self.checkpoints = [self.read_checkpoint(cp) for cp in config["checkpoints"]]
+        self.finish_line = self.read_checkpoint(config["finish_line"])
+        self.laps = config.get("laps", 3)
+
         # Reconstitution du chemin d'accès à l'image PNG de la texture
         track_dir = os.path.dirname(json_path)
         self.texture_path = os.path.join(track_dir, f"{self.name}.png")
@@ -46,6 +52,10 @@ class Circuit:
         # Conversion de l'image PNG en grille 2D de RoadTile
         self.rows = len(self.grid) if self.grid else 0
         self.cols = len(self.grid[0]) if self.grid else 0
+
+    def read_checkpoint(self, data: dict) -> Checkpoint:
+        """Crée un Checkpoint à partir de sa description dans le JSON"""
+        return Checkpoint(data["x"], data["y"], data["width"], data["height"], data["angle"])
 
     def get_tile(self, col: int, row: int) -> RoadTile | None:
         """ Récupération d'une tuile, va servir à déterminer l'interaction voiture / sol """
