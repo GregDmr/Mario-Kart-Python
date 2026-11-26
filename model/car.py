@@ -314,6 +314,17 @@ class Car:
     def render_tire_mark(self,tire_mark):
         self.tire_mark_list.append(tire_mark)
 
+    def reset(self, x: float, y: float, angle: float) -> None:
+        """Replace la voiture à l'arrêt en (x, y), orientée selon angle (degrés)"""
+        self.x, self.y, self.angle = x, y, angle
+        self.vx = self.vy = self.omegad = 0.0
+        self.fz_ax = self.fz_ay = 0.0
+        self.steering_multiplier = self.steering_angle = 0.0
+        self.torque_multiplier = self.desired_torque = 0.0
+        for tire in self.list_tires:
+            tire.rot_speed_tire = 0.0  #sinon la roue relance la voiture
+            tire.def_x = tire.def_y = 0.0
+
     def big_hit(self):
         """ Effet fake itembox et carapace verte / bleue """
         self.vx = 0

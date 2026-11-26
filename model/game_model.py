@@ -3,7 +3,7 @@ from model.car import Car
 from model.player import Player
 from model.circuit import Circuit
 from model.road_tile import RoadTile
-from model.menu import Menu, MainMenu, TrackMenu, PauseMenu, texture_path
+from model.menu import Menu, MainMenu, TrackMenu, PauseMenu, ResultsMenu, texture_path
 from pygame.image import load
 from pygame.transform import scale
 from model.item import ItemBox
@@ -26,6 +26,7 @@ class GameModel:
             GameState.MENU: MainMenu(self),
             GameState.TRACK_SELECT: TrackMenu(self),
             GameState.PAUSE: PauseMenu(self),
+            GameState.RESULTS: ResultsMenu(self),
         }
 
     def current_menu(self):
@@ -103,6 +104,10 @@ class GameModel:
         # Mise à jour de la position de la voiture et de ses propriétés internes
         for player in self.players:
             player.car.update_position()
+            player.update_progress(self.circuit)
+            if player.laps >= self.circuit.laps:
+                self.finish_race(player)
+                return
 
         # Gestion des objets (réapparition + collisions + objets drop au sol)
         for item in self.items:
@@ -116,6 +121,15 @@ class GameModel:
 
         # Nettoyage de la liste d'items suivant le booléen to_remove
         self.items = [item for item in self.items if not item.to_remove]
+
+    def finish_race(self, winner: Player) -> None:
+        """Termine la course et affiche l'écran de fin avec le nom du vainqueur"""
+        self.menus[GameState.RESULTS].title = f"{winner.name} gagne !"
+        self.change_state(GameState.RESULTS)
+
+    def respawn(self, player_index: int) -> None:
+        """Replace la voiture du joueur au dernier point de passage qu'il a franchi"""
+        self.players[player_index].respawn()
 
     def use_item(self, player_index: int, audio_controller=None) -> None:
         """ Le joueur utilise son objet (à compléter avec les objets) """

@@ -42,6 +42,7 @@ class GameState:
     LOADING = "loading"
     RACING = "racing"
     PAUSE = "pause"
+    RESULTS = "results"
     QUIT = "quit"
 
 
@@ -86,14 +87,16 @@ DEFAULT_KEYBINDS = [
      "turn_left": [pygame.K_q, pygame.K_a], 
      "turn_right": [pygame.K_d], 
      "use_item": [pygame.K_SPACE],
-     "klaxon": [pygame.K_LSHIFT]},
+     "klaxon": [pygame.K_LSHIFT],
+     "respawn": [pygame.K_r]},
     
     {"accelerate": [pygame.K_UP], 
      "decelerate": [pygame.K_DOWN],
      "turn_left": [pygame.K_LEFT],
      "turn_right": [pygame.K_RIGHT], 
      "use_item": [pygame.K_RETURN],
-     "klaxon": [pygame.K_RSHIFT]}
+     "klaxon": [pygame.K_RSHIFT],
+     "respawn": [pygame.K_RCTRL]}
 ]
 
 # -- PATH --
