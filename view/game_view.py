@@ -50,7 +50,7 @@ class GameView:
         title_y, first_y = 140, 280
 
         if panel:  #Menu dans un encadré au centre de l'écran (pause)
-            box = pygame.Rect(0, 0, 420, 320)
+            box = pygame.Rect(0, 0, 520, 400)
             box.center = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
             pygame.draw.rect(self.screen, COLOR_BG, box, border_radius=12)
             pygame.draw.rect(self.screen, COLOR_PANEL_BORDER, box, 2, border_radius=12)

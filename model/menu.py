@@ -101,16 +101,18 @@ class TrackMenu(Menu):
 
 
 class PauseMenu(Menu):
-    """Pause : reprendre la course ou revenir au menu principal"""
+    """Pause : reprendre la course, la recommencer ou revenir au menu principal"""
 
     title = "Pause"
 
     def __init__(self, game_model):
-        super().__init__(game_model, ["Reprendre", "Menu principal"])
+        super().__init__(game_model, ["Reprendre", "Recommencer", "Menu principal"])
 
     def select(self):
         if self.selected == 0:  #Option "Reprendre" : la course repart là où elle était
             self.game_model.change_state(GameState.RACING)
+        elif self.selected == 1:  #Option "Recommencer" : mêmes voitures, même circuit
+            self.game_model.restart_race()
         else:  #Option "Menu principal" : la course est abandonnée
             self.game_model.change_state(GameState.MENU)
 

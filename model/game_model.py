@@ -48,6 +48,14 @@ class GameModel:
         self.load_circuit(self.pending_track)
         self.change_state(GameState.RACING)
 
+    def restart_race(self):
+        """Relance la course sur le circuit déjà chargé, sans le reconvertir"""
+        self.spawn_players()
+        self.items = list(self.circuit.item_boxes)
+        for item in self.items:
+            item.is_active = True
+        self.change_state(GameState.RACING)
+
     def load_circuit(self, json_track_path: str) -> None:
         """Charge le circuit depuis son fichier JSON, prépare le rendu et fait spawner les entités."""
 
