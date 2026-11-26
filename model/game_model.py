@@ -103,6 +103,7 @@ class GameModel:
         # Mise à jour de la position de la voiture et de ses propriétés internes
         for player in self.players:
             player.car.update_position()
+            player.update_progress(self.circuit)
 
         # Gestion des objets (réapparition + collisions + objets drop au sol)
         for item in self.items:

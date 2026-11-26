@@ -154,7 +154,21 @@ class GameView:
 
         # Affichage interface des objets
         self._draw_items_hud(model.players)
+        self._draw_race_hud(model)
 
+    def _draw_race_hud(self, model: GameModel) -> None:
+        """Tour en cours et points de passage franchis de chaque joueur, sous son slot d'objet"""
+        total = model.circuit.laps
+        nb_checkpoints = len(model.circuit.checkpoints)
+        for player in model.players:
+            lap = min(player.laps + 1, total)  #pas de "tour 4/3" une fois la course finie
+            label = f"{player.name}  Tour {lap}/{total}  Point {player.next_checkpoint}/{nb_checkpoints}"
+            text = self.font.render(label, True, COLOR_TEXT)
+            if player.index == 0:
+                rect = text.get_rect(topleft=(20, 130))
+            else:
+                rect = text.get_rect(topright=(WINDOW_WIDTH - 20, 130))
+            self.screen.blit(text, rect)
 
     def _draw_items_hud(self, players: list):
         """Affiche le slot d'objet pour les 2 joueurs (J1 en haut à gauche, J2 en haut à droite)."""
