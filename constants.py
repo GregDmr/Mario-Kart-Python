@@ -80,8 +80,17 @@ FINAL_DRIVE = [4,2,2,2] #rapport de transmission moteur -> roues, proportionnel 
 CAR_IZZ = [1100,72,68,60] #KG * m²
 CAR_SPRITE = ["01_yellow_test.png", "02_DK.png", "03_WL.png", "04_YO.png"]
 CAR_SPRITES_DIRECTORY = "assets/sprites/cars"
+CAR_ICONS_DIRECTORY = "assets/sprites/icons"  #icônes du choix des personnages, même nom de fichier que le sprite
 CAR_NAMES = ["Voiture test", "DK", "WL", "YO"]  #noms affichés dans le menu de choix
 SELECTABLE_CARS = [1, 2, 3]  #indices des voitures proposées dans le menu
+#statistiques sur 10 affichées dans le choix des personnages (provisoires, sans effet sur la physique)
+CAR_STATS = [
+    {"Vitesse": 9, "Accélération": 6, "Poids": 10, "Maniabilité": 3},
+    {"Vitesse": 8, "Accélération": 5, "Poids": 9, "Maniabilité": 4},
+    {"Vitesse": 7, "Accélération": 7, "Poids": 7, "Maniabilité": 6},
+    {"Vitesse": 6, "Accélération": 8, "Poids": 5, "Maniabilité": 8},
+]
+STAT_MAX = 10
 
 #Touches par défaut de chaque joueur (action -> touches)
 DEFAULT_KEYBINDS = [

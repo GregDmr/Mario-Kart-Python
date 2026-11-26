@@ -1,7 +1,7 @@
 import os
 import json
 from abc import ABC, abstractmethod
-from constants import GameState, PATH_TRACKS, CAR_NAMES, SELECTABLE_CARS
+from constants import GameState, PATH_TRACKS, CAR_NAMES, SELECTABLE_CARS, CAR_SPRITE, CAR_ICONS_DIRECTORY, CAR_STATS
 
 
 
@@ -38,6 +38,10 @@ class Menu(ABC):
     def preview_path(self):
         """Image d'aperçu de l'option sélectionnée, aucune par défaut"""
         return None  #Seul TrackMenu la redéfinit
+
+    def stats(self):
+        """Statistiques de l'option sélectionnée, aucune par défaut"""
+        return None  #Seul CarMenu la redéfinit
 
 
 class MainMenu(Menu):
@@ -126,6 +130,14 @@ class CarMenu(Menu):
             self.set_player(0)
         else:
             self.game_model.change_state(GameState.TRACK_SELECT)
+
+    def preview_path(self):
+        """Icône du personnage sélectionné"""
+        return os.path.join(CAR_ICONS_DIRECTORY, CAR_SPRITE[SELECTABLE_CARS[self.selected]])
+
+    def stats(self):
+        """Statistiques du personnage sélectionné"""
+        return CAR_STATS[SELECTABLE_CARS[self.selected]]
 
 
 class PauseMenu(Menu):

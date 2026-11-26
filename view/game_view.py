@@ -1,8 +1,9 @@
+import os
 import json
 import pygame
 from constants import (
     WINDOW_WIDTH, WINDOW_HEIGHT, TILE_SIZE,
-    COLOR_BG, COLOR_TEXT, COLOR_ACCENT, COLOR_PANEL, COLOR_PANEL_BORDER, COLOR_HINT, COLOR_HUD,
+    COLOR_BG, COLOR_TEXT, COLOR_ACCENT, COLOR_PANEL, COLOR_PANEL_BORDER, COLOR_HINT, COLOR_HUD, STAT_MAX,
     GameState
 )
 from model.game_model import GameModel
@@ -82,7 +83,10 @@ class GameView:
             pygame.draw.polygon(self.screen, COLOR_HINT, [(cx, first_y + 418), (cx - 14, first_y + 402), (cx + 14, first_y + 402)])
 
         if preview:
-            self._draw_preview_panel(preview, menu.options[menu.selected])
+            if menu.stats() is None:
+                self._draw_preview_panel(preview, menu.options[menu.selected])
+            else:  #choix des personnages : icône et statistiques
+                self._draw_car_panel(preview, menu.options[menu.selected], menu.stats())
 
     def _draw_results(self, menu: Menu):
         """Ecran de fin : nom du vainqueur au centre, bouton de retour au menu en bas"""
@@ -134,6 +138,35 @@ class GameView:
 
         name_text = self.name_font.render(name, True, COLOR_TEXT)
         self.screen.blit(name_text, name_text.get_rect(center=(panel.centerx, rect.bottom + 45)))
+
+    def _draw_car_panel(self, icon_path: str, name: str, stats: dict[str, int]):
+        """Encadré à droite : icône et nom du personnage à gauche, barres de statistiques à droite"""
+        panel = pygame.Rect(0, 0, 620, 440)
+        panel.center = (WINDOW_WIDTH * 2 // 3, 450)
+        pygame.draw.rect(self.screen, COLOR_PANEL, panel, border_radius=12)
+        pygame.draw.rect(self.screen, COLOR_PANEL_BORDER, panel, 2, border_radius=12)
+
+        icon_center = (panel.left + 150, panel.centery - 30)
+        if os.path.exists(icon_path):  #l'encadré reste affiché tant que l'icône n'est pas ajoutée
+            if icon_path not in self.previews:
+                self.previews[icon_path] = pygame.image.load(icon_path).convert()  #icône déjà à la bonne taille
+            icon = self.previews[icon_path]
+            icon_rect = icon.get_rect(center=icon_center)
+            self.screen.blit(icon, icon_rect)
+            pygame.draw.rect(self.screen, COLOR_PANEL_BORDER, icon_rect.inflate(6, 6), 3)
+        name_text = self.name_font.render(name, True, COLOR_TEXT)
+        self.screen.blit(name_text, name_text.get_rect(center=(icon_center[0], icon_center[1] + 125)))
+
+        bar_x, bar_width = panel.left + 300, 280
+        for i, (label, value) in enumerate(stats.items()):
+            y = panel.top + 70 + i * 85
+            self.screen.blit(self.font.render(label, True, COLOR_TEXT), (bar_x, y))
+            bar = pygame.Rect(bar_x, y + 36, bar_width, 18)
+            pygame.draw.rect(self.screen, COLOR_BG, bar, border_radius=6)
+            filled = bar.copy()
+            filled.width = bar_width * value // STAT_MAX
+            pygame.draw.rect(self.screen, COLOR_ACCENT, filled, border_radius=6)
+            pygame.draw.rect(self.screen, COLOR_PANEL_BORDER, bar, 2, border_radius=6)
 
     def _draw_racing(self, model: GameModel) -> None:
 
