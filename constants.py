@@ -16,11 +16,13 @@ WINDOW_HEIGHT = TILE_SIZE * GRID_ROWS
 
 #Propriétés des ROAD_TILES
 
-FRICTION_COEFFS = [1.8 ,1.1,1.5,0.6,1.4,0.8] #route, herbe, mur, glace, vibreur, sable
-#force constante qui freine la voiture quand elle roule (N), moyenne des 4 pneus. Même ordre que FRICTION_COEFFS
-STATIC_FRICTION = [30,600,400,20,60,1000] #route, herbe, mur, glace, vibreur, sable
-AIR_RESISTANCE = 0.6 #coefficient de la force en vitesse au carré (N / (m/s)²)
-ROLLING_RESISTANCE = 0.5 #coefficient de la force proportionnelle à la vitesse (N / (m/s))
+FRICTION_COEFFS = [1.9 ,1.6,1.5,0.6,1.4,1.5] #route, herbe, mur, glace, vibreur, sable
+#facteur de résistance de chaque sol (route = 1), multiplie les 3 termes de résistance ci-dessous. Même ordre que FRICTION_COEFFS
+ROLLING_RESISTANCE = [1,3,35,0.5,2,40] #route, herbe, mur, glace, vibreur, sable
+#résistance sur route (facteur 1) : force = const + linéaire * v + quadratique * v²
+RESISTANCE_CONST = 35 #N, force constante qui s'oppose au roulement
+RESISTANCE_LINEAR = 0.3 #N / (m/s)
+RESISTANCE_QUAD = 0.4 #N / (m/s)², air + sol
 
 #Coefficients de la Magic Tire Equation
 PACEJKA_B_LONG = 10

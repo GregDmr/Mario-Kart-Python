@@ -207,10 +207,10 @@ class Car:
         fx_car = 0
         fy_car = 0
         mom_tot = 0
-        static_friction_tot = 0
+        rolling_res_tot = 0
         for tire in self.list_tires:
-            fx,fy,tire_mark,static_friction = tire.compute_forces()
-            static_friction_tot += static_friction
+            fx,fy,tire_mark,rolling_res = tire.compute_forces()
+            rolling_res_tot += rolling_res
 
             if tire.offset_length>0:
                 fx_car = fx * math.cos(self.steering_angle) - fy*math.sin(self.steering_angle)
@@ -224,12 +224,12 @@ class Car:
             fx_tot += fx_car
             fy_tot +=fy_car
             mom_tot += tire.offset_length * fy_car - tire.offset_width * fx_car
-        fx_tot -= self.vx *abs(self.vx) * c.AIR_RESISTANCE + c.ROLLING_RESISTANCE * self.vx #friction due a l'air (vitesse carrée) et au roulement (vitesse lineaire)
-        static_friction = static_friction_tot / len(self.list_tires) #moyenne des pneus, selon le sol sous chacun
+        rolling_res = rolling_res_tot / len(self.list_tires) #facteur moyen des pneus, selon le sol sous chacun
+        fx_tot -= rolling_res * (self.vx * abs(self.vx) * c.RESISTANCE_QUAD + self.vx * c.RESISTANCE_LINEAR) #termes en vitesse carrée et linéaire
         if self.vx >= 0.2:
-            fx_tot -= static_friction
+            fx_tot -= rolling_res * c.RESISTANCE_CONST
         elif self.vx <= -0.2:
-            fx_tot += static_friction #force constante du sol, pas appliquée à l'arrêt pour ne pas faire vibrer la voiture
+            fx_tot += rolling_res * c.RESISTANCE_CONST #force constante, pas appliquée à l'arrêt pour ne pas faire vibrer la voiture
 
         self.fz_ax = fx_tot/self.mass #accélérations réelles du corps, gardées pour le calcul de Fz à la frame suivante
         self.fz_ay = fy_tot/self.mass
