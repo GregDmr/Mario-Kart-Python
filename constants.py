@@ -42,6 +42,7 @@ class GameState:
     LOADING = "loading"
     RACING = "racing"
     PAUSE = "pause"
+    RESULTS = "results"
     QUIT = "quit"
 
 

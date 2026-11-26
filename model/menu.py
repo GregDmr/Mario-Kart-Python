@@ -118,3 +118,18 @@ class PauseMenu(Menu):
 
     def back(self):
         self.game_model.change_state(GameState.RACING)  #Echap en pause reprend la course
+
+
+class ResultsMenu(Menu):
+    """Fin de course : nom du vainqueur et retour au menu principal"""
+
+    title = "Course terminée"  #remplacé par le nom du vainqueur à la fin de la course
+
+    def __init__(self, game_model):
+        super().__init__(game_model, ["Menu principal"])
+
+    def select(self):
+        self.game_model.change_state(GameState.MENU)
+
+    def back(self):
+        self.game_model.change_state(GameState.MENU)

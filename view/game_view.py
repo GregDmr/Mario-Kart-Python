@@ -14,6 +14,7 @@ HINTS = {  #Rappel des touches propre à chaque écran
     GameState.MENU: "↑ ↓ : choisir    Entrée : valider    Echap : quitter",
     GameState.TRACK_SELECT: "↑ ↓ : choisir    Entrée : lancer la course    Echap : retour",
     GameState.PAUSE: "↑ ↓ : choisir    Entrée : valider    Echap : reprendre",
+    GameState.RESULTS: "Entrée : menu principal",
 }
 
 class GameView:
@@ -28,12 +29,15 @@ class GameView:
 
     def draw(self, model: GameModel) -> None:
         self.screen.fill(COLOR_BG)
-        if model.state in (GameState.RACING, GameState.PAUSE):  #En pause, la course reste affichée, figée
+        if model.state in (GameState.RACING, GameState.PAUSE, GameState.RESULTS):  #En pause, la course reste affichée, figée
             self._draw_racing(model)
         menu = model.current_menu()
         if model.state == GameState.PAUSE:
             self._draw_veil()
             self._draw_menu(menu, panel=True)
+        elif model.state == GameState.RESULTS:
+            self._draw_veil()
+            self._draw_results(menu)
         elif menu is not None:  #Si on est dans un menu (peu importe lequel)
             self._draw_menu(menu)
         elif model.state == GameState.LOADING:
@@ -78,6 +82,18 @@ class GameView:
 
         if preview:
             self._draw_preview_panel(preview, menu.options[menu.selected])
+
+    def _draw_results(self, menu: Menu):
+        """Ecran de fin : nom du vainqueur au centre, bouton de retour au menu en bas"""
+        title = self.title_font.render(menu.title, True, COLOR_ACCENT)
+        self.screen.blit(title, title.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)))
+
+        rect = pygame.Rect(0, 0, 320, 56)
+        rect.center = (WINDOW_WIDTH // 2, WINDOW_HEIGHT - 120)
+        pygame.draw.rect(self.screen, COLOR_PANEL, rect, border_radius=8)
+        pygame.draw.rect(self.screen, COLOR_ACCENT, rect, 3, border_radius=8)  #seul bouton, donc toujours sélectionné
+        text = self.font.render(menu.options[0], True, COLOR_ACCENT)
+        self.screen.blit(text, text.get_rect(center=rect.center))
 
     def _draw_hint(self, text: str):
         """Rappel des touches en bas de l'écran"""
@@ -132,7 +148,7 @@ class GameView:
                 alpha = max(0, 255 * tire_mark.lifespan // tire_mark.lifespan_init) #255 = opaque, 0 = invisible
                 sprite.set_alpha(alpha)
                 self.screen.blit(sprite, rect)
-                if model.state != GameState.PAUSE:
+                if model.state == GameState.RACING:
                     tire_mark.lifespan_decount()
         for player in model.players:
             surf, rect = player.car.get_rotated_sprite()
