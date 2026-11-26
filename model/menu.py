@@ -1,7 +1,7 @@
 import os
 import json
 from abc import ABC, abstractmethod
-from constants import GameState, PATH_TRACKS
+from constants import GameState, PATH_TRACKS, CAR_NAMES, SELECTABLE_CARS
 
 
 
@@ -98,6 +98,34 @@ class TrackMenu(Menu):
 
         return png_path
 
+
+class CarMenu(Menu):
+    """Choix du personnage de chaque joueur, l'un après l'autre"""
+
+    def __init__(self, game_model):
+        super().__init__(game_model, [CAR_NAMES[car] for car in SELECTABLE_CARS])
+        self.set_player(0)
+
+    def set_player(self, player: int):
+        """Passe au joueur donné et place le curseur sur son personnage actuel"""
+        self.player = player  #Joueur (0 ou 1) qui choisit en ce moment
+        self.title = f"Joueur {player + 1} : choix du personnage"
+        self.selected = SELECTABLE_CARS.index(self.game_model.chosen_cars[player])
+
+    def select(self):
+        """Retient le personnage du joueur, puis passe au joueur suivant ou au chargement"""
+        self.game_model.chosen_cars[self.player] = SELECTABLE_CARS[self.selected]
+        if self.player == 0:
+            self.set_player(1)
+        else:
+            self.game_model.change_state(GameState.LOADING)
+
+    def back(self):
+        """Revient au choix du joueur 1, ou au choix du circuit"""
+        if self.player == 1:
+            self.set_player(0)
+        else:
+            self.game_model.change_state(GameState.TRACK_SELECT)
 
 
 class PauseMenu(Menu):

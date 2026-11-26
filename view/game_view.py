@@ -12,7 +12,8 @@ MAX_VISIBLE_OPTIONS = 6  #Au-delà, la liste défile
 
 HINTS = {  #Rappel des touches propre à chaque écran
     GameState.MENU: "↑ ↓ : choisir    Entrée : valider    Echap : quitter",
-    GameState.TRACK_SELECT: "↑ ↓ : choisir    Entrée : lancer la course    Echap : retour",
+    GameState.TRACK_SELECT: "↑ ↓ : choisir    Entrée : choisir les personnages    Echap : retour",
+    GameState.CAR_SELECT: "↑ ↓ : choisir    Entrée : valider    Echap : retour",
     GameState.PAUSE: "↑ ↓ : choisir    Entrée : valider    Echap : reprendre",
     GameState.RESULTS: "Entrée : menu principal",
 }

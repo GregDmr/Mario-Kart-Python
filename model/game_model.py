@@ -3,7 +3,7 @@ from model.car import Car
 from model.player import Player
 from model.circuit import Circuit
 from model.road_tile import RoadTile
-from model.menu import Menu, MainMenu, TrackMenu, PauseMenu, ResultsMenu, texture_path
+from model.menu import Menu, MainMenu, TrackMenu, CarMenu, PauseMenu, ResultsMenu, texture_path
 from pygame.image import load
 from pygame.transform import scale
 from model.item import ItemBox
@@ -20,11 +20,13 @@ class GameModel:
         self.keybinds = [{action: list(keys) for action, keys in player_keys.items()} for player_keys in DEFAULT_KEYBINDS]
         self.items = [] # Liste des items présents sur la piste
         self.pending_track: str | None = None  #Circuit choisi, chargé pendant l'écran de chargement
+        self.chosen_cars: list[int] = [1, 3]  #Indice de la voiture de chaque joueur (listes de constants.py)
 
         # Un menu par état qui en a un
         self.menus: dict[str, Menu] = {
             GameState.MENU: MainMenu(self),
             GameState.TRACK_SELECT: TrackMenu(self),
+            GameState.CAR_SELECT: CarMenu(self),
             GameState.PAUSE: PauseMenu(self),
             GameState.RESULTS: ResultsMenu(self),
         }
@@ -38,11 +40,13 @@ class GameModel:
         self.state = new_state
         if new_state == GameState.PAUSE:  #La pause s'ouvre toujours sur "Reprendre"
             self.menus[GameState.PAUSE].selected = 0
+        if new_state == GameState.CAR_SELECT:  #Le choix commence toujours par le joueur 1
+            self.menus[GameState.CAR_SELECT].set_player(0)
 
     def prepare_race(self, track_path: str):
-        """Retient le circuit choisi et passe à l'écran de chargement"""
+        """Retient le circuit choisi et passe au choix des personnages"""
         self.pending_track = track_path
-        self.change_state(GameState.LOADING)
+        self.change_state(GameState.CAR_SELECT)
 
     def start_race(self):
         """Charge le circuit retenu et lance la course"""
@@ -81,15 +85,13 @@ class GameModel:
         self.cars.clear()
 
         # On parcourt les positions définies dans la configuration du circuit
-        #temp for testing :
-        CHOSEN_CARS = [1,3]
         for index, spawn in enumerate(self.circuit.starting_positions):
             x = spawn["x"]
             y = spawn["y"]
             angle = spawn.get("angle", 90)
 
             # Instanciation de la voiture et du joueur associés
-            car = Car(self.circuit, x, y, CHOSEN_CARS[index], angle)
+            car = Car(self.circuit, x, y, self.chosen_cars[index], angle)
             player = Player(index, car)
 
             self.cars.append(car)

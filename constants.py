@@ -39,6 +39,7 @@ MAX_SLIP = 0.2 #glissement max stocké dans le patch (pic de Pacejka vers 0.15)
 class GameState:
     MENU = "menu"
     TRACK_SELECT = "track_select"
+    CAR_SELECT = "car_select"
     LOADING = "loading"
     RACING = "racing"
     PAUSE = "pause"
@@ -79,6 +80,8 @@ FINAL_DRIVE = [4,2,2,2] #rapport de transmission moteur -> roues, proportionnel 
 CAR_IZZ = [1100,72,68,60] #KG * m²
 CAR_SPRITE = ["01_yellow_test.png", "02_DK.png", "03_WL.png", "04_YO.png"]
 CAR_SPRITES_DIRECTORY = "assets/sprites/cars"
+CAR_NAMES = ["Voiture test", "DK", "WL", "YO"]  #noms affichés dans le menu de choix
+SELECTABLE_CARS = [1, 2, 3]  #indices des voitures proposées dans le menu
 
 #Touches par défaut de chaque joueur (action -> touches)
 DEFAULT_KEYBINDS = [
