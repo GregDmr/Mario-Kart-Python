@@ -30,8 +30,9 @@ class Circuit:
         track_dir = os.path.dirname(json_path)
         self.texture_path = os.path.join(track_dir, f"{self.name}.png")
 
-        # Récupération de la grille d'entiers via convert_track
-        type_grid = convert_track(self.texture_path)
+        # La grille est lue sur l'image layout (couleurs unies), pas sur la texture
+        layout_path = os.path.join(track_dir, f"{self.name}_layout.png")
+        type_grid = convert_track(layout_path)
 
         # Conversion en matrice 2D d'objets RoadTile
         self.grid: list[list[RoadTile]] = [
