@@ -29,6 +29,11 @@ class Player:
             # On retourne l'objet drop pour le game_model
             return drop_item
 
+    def respawn(self) -> None:
+        """Ramène la voiture au dernier point de passage franchi, à l'arrêt"""
+        x, y, angle = self.respawn_point
+        self.car.reset(x, y, angle)
+
     def update_progress(self, circuit: Circuit) -> None:
         """Valide le prochain point de passage, ou la ligne d'arrivée une fois tous les points franchis"""
         if self.next_checkpoint < len(circuit.checkpoints):

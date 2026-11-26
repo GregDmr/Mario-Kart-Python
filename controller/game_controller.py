@@ -69,6 +69,9 @@ class GameController:
                 elif key in handler.keybinds.get("klaxon", []):
                     sound_name = f'horn{index+1}'
                     self.audio_handler.play_sound(sound_name)
+                # Gestion touche pour revenir au dernier point de passage
+                elif key in handler.keybinds.get("respawn", []):
+                    self.model.respawn(index)
 
         if self.model.state == c.GameState.LOADING:  #Un circuit vient d'être choisi
             self.render()  #On affiche l'écran de chargement avant de charger, sinon il n'apparaîtrait jamais

@@ -118,6 +118,10 @@ class GameModel:
         # Nettoyage de la liste d'items suivant le booléen to_remove
         self.items = [item for item in self.items if not item.to_remove]
 
+    def respawn(self, player_index: int) -> None:
+        """Replace la voiture du joueur au dernier point de passage qu'il a franchi"""
+        self.players[player_index].respawn()
+
     def use_item(self, player_index: int, audio_controller=None) -> None:
         """ Le joueur utilise son objet (à compléter avec les objets) """
         player = self.players[player_index]

@@ -2,7 +2,7 @@ import json
 import pygame
 from constants import (
     WINDOW_WIDTH, WINDOW_HEIGHT, TILE_SIZE,
-    COLOR_BG, COLOR_TEXT, COLOR_ACCENT, COLOR_PANEL, COLOR_PANEL_BORDER, COLOR_HINT, COLOR_HUD, SHOW_CHECKPOINTS,
+    COLOR_BG, COLOR_TEXT, COLOR_ACCENT, COLOR_PANEL, COLOR_PANEL_BORDER, COLOR_HINT, COLOR_HUD,
     GameState
 )
 from model.game_model import GameModel
@@ -124,9 +124,6 @@ class GameView:
         
         if model.circuit is None:
             return
-        if SHOW_CHECKPOINTS:
-            for checkpoint in model.circuit.checkpoints + [model.circuit.finish_line]:
-                pygame.draw.rect(self.screen, COLOR_ACCENT, checkpoint.rect, 2)
 
         #affichage des tire marks, avant la voiture pour qu'elles soient dessous
         for player in model.players:
@@ -157,12 +154,11 @@ class GameView:
         self._draw_race_hud(model)
 
     def _draw_race_hud(self, model: GameModel) -> None:
-        """Tour en cours et points de passage franchis de chaque joueur, sous son slot d'objet"""
+        """Tour en cours de chaque joueur, sous son slot d'objet"""
         total = model.circuit.laps
-        nb_checkpoints = len(model.circuit.checkpoints)
         for player in model.players:
             lap = min(player.laps + 1, total)  #pas de "tour 4/3" une fois la course finie
-            label = f"{player.name}  Tour {lap}/{total}  Point {player.next_checkpoint}/{nb_checkpoints}"
+            label = f"{player.name}  Tour {lap}/{total}"
             text = self.font.render(label, True, COLOR_TEXT)
             if player.index == 0:
                 rect = text.get_rect(topleft=(20, 130))

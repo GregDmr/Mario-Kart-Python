@@ -53,7 +53,6 @@ COLOR_PANEL = (30, 30, 50)
 COLOR_PANEL_BORDER = (60, 60, 100)
 COLOR_HINT = (150, 150, 170)
 COLOR_HUD = (255, 0, 0)
-SHOW_CHECKPOINTS = True  #contours des points de passage, pour les placer (False pour le rendu)
 
 #Charactéristiques des voitures : [voiture test jaune, DK, WL, YO]
 #voiture test = petite sportive, karts = karts haut de gamme (rapport poids/puissance élevé, CG bas, empattement court)
@@ -87,14 +86,16 @@ DEFAULT_KEYBINDS = [
      "turn_left": [pygame.K_q, pygame.K_a], 
      "turn_right": [pygame.K_d], 
      "use_item": [pygame.K_SPACE],
-     "klaxon": [pygame.K_LSHIFT]},
+     "klaxon": [pygame.K_LSHIFT],
+     "respawn": [pygame.K_r]},
     
     {"accelerate": [pygame.K_UP], 
      "decelerate": [pygame.K_DOWN],
      "turn_left": [pygame.K_LEFT],
      "turn_right": [pygame.K_RIGHT], 
      "use_item": [pygame.K_RETURN],
-     "klaxon": [pygame.K_RSHIFT]}
+     "klaxon": [pygame.K_RSHIFT],
+     "respawn": [pygame.K_RCTRL]}
 ]
 
 # -- PATH --
