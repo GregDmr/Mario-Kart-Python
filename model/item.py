@@ -313,6 +313,8 @@ class Star(Item):
         if audio_controller:
             audio_controller.play_sound("use_star")
 
+        player.car.special_effect()
+
 class Bobomb(Item):
     def __init__(self, x: float = 0, y: float = 0, track_size: int = 32, icon_size: int = 64):
         super().__init__(x, y, size=track_size, image_path=c.SPRITE_BOBOMB)

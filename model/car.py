@@ -79,7 +79,8 @@ class Car:
         self.slide_wx = 0 #vitesse de la voiture dans le repère de la piste au moment de la banane
         self.slide_wy = 0
         self.timer_boost = 0
-        self.boost_flag = False #True si boost_control a imposé les vitesses de cette frame
+        self.timer_special = 0
+        self.special_flag = False #True si boost_control ou special_control a imposé les vitesses de cette frame
     def get_rect(self) -> pygame.Rect:
         """Calcule et renvoie le rectangle de collision pour la voiture."""
         centre_x = round(self.x - sind(self.angle) * self.center_grav_x * ppm)
@@ -97,6 +98,9 @@ class Car:
 
         if self.timer_boost > 0:
             self.boost_control(input_dico)
+            return
+        if self.timer_special > 0:
+            self.special_control(input_dico)
             return
 
         # torque_multiplier entre -1 et 1 : la logique d'incrémentation reste hard codée volontairement
@@ -176,8 +180,8 @@ class Car:
     def update_position(self) -> None:
         """ Met à jour la position de la voiture en fonction de sa vitesse"""
         self.tire_mark_list = [m for m in self.tire_mark_list if m.lifespan > 0] #itere dans la liste, mais ne valide pas la classe si lifespan =0 ou moins
-        if self.boost_flag:
-            self.boost_flag = False #les vitesses viennent de boost_control, pas de la physique
+        if self.special_flag:
+            self.special_flag = False #les vitesses viennent de boost_control ou special_control, pas de la physique
         else:
             accels = self.compute_accelerations()
             self.compute_speeds(accels)
@@ -443,8 +447,34 @@ class Car:
         for tire in self.list_tires:
             tire.rot_speed_tire = self.vx / tire.tire_radius #pour que la physique reprenne sans à-coup
         self.timer_boost -= 1
-        self.boost_flag = True
+        self.special_flag = True
 
     def special_effect(self):
         """ Effet spécial pour l'étoile, un peu plus rapide et peut être rendre la voiture plsu maniable"""
-    
+        self.timer_special = 240
+
+    def special_control(self, input_dico):
+        """ Pendant l'étoile : la vitesse varie linéairement vers +/-22 m/s, la direction se contrôle avec omegad """
+        speed = self.vx
+        speed_max = 22 #m/s
+        speed_step = 1 
+        turn_rate = 2.4 #rad/s
+        if input_dico["accelerate"] and not input_dico["decelerate"]:
+            if speed < speed_max:
+                speed = min(speed + speed_step, speed_max)
+        elif input_dico["decelerate"] and not input_dico["accelerate"]:
+            if speed > -speed_max:
+                speed = max(speed - speed_step, -speed_max)
+
+        self.vx = speed
+        self.vy = 0
+        if input_dico["turn_left"] and not input_dico["turn_right"]:
+            self.omegad = turn_rate
+        elif input_dico["turn_right"] and not input_dico["turn_left"]:
+            self.omegad = -turn_rate
+        else:
+            self.omegad = 0
+        for tire in self.list_tires:
+            tire.rot_speed_tire = self.vx / tire.tire_radius
+        self.timer_special -= 1
+        self.special_flag = True
