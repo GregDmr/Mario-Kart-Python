@@ -78,6 +78,8 @@ class Car:
         self.timer_slide = 0
         self.slide_wx = 0 #vitesse de la voiture dans le repère de la piste au moment de la banane
         self.slide_wy = 0
+        self.timer_boost = 0
+        self.boost_flag = False #True si boost_control a imposé les vitesses de cette frame
     def get_rect(self) -> pygame.Rect:
         """Calcule et renvoie le rectangle de collision pour la voiture."""
         centre_x = round(self.x - sind(self.angle) * self.center_grav_x * ppm)
@@ -92,6 +94,10 @@ class Car:
         return math.hypot(self.vx, self.vy)
 
     def compute_new_metrics(self, input_dico):
+
+        if self.timer_boost > 0:
+            self.boost_control(input_dico)
+            return
 
         # torque_multiplier entre -1 et 1 : la logique d'incrémentation reste hard codée volontairement
         if input_dico["decelerate"]:
@@ -170,9 +176,11 @@ class Car:
     def update_position(self) -> None:
         """ Met à jour la position de la voiture en fonction de sa vitesse"""
         self.tire_mark_list = [m for m in self.tire_mark_list if m.lifespan > 0] #itere dans la liste, mais ne valide pas la classe si lifespan =0 ou moins
-        accels = self.compute_accelerations()
-       
-        self.compute_speeds(accels)
+        if self.boost_flag:
+            self.boost_flag = False #les vitesses viennent de boost_control, pas de la physique
+        else:
+            accels = self.compute_accelerations()
+            self.compute_speeds(accels)
         dt = 1 / c.FPS
         
         #colisions objets :
@@ -386,12 +394,14 @@ class Car:
         
     def big_hit(self):
         """ Effet fake itembox et carapace verte / bleue """
-        stun_duration = 60
+        stun_duration = 45
         if self.timer_big_hit == 0:
+            self.sens_rot = random.sample([-1,1],1)
             self.timer_big_hit = stun_duration
         self.vx = 0
         self.vy = 0
-        self.omegad = 6.28
+        
+        self.omegad = self.sens_rot[0]*2*math.pi /(stun_duration/60)
         self.timer_big_hit -=1
       
     def slide(self):
@@ -411,7 +421,29 @@ class Car:
 
     def boost(self):
         """ Effet accélération champignon / boostpad"""
-        pass
+        self.timer_boost = 90
+
+    def boost_control(self, input_dico):
+        """ Pendant le boost : vitesse fixe, la direction se contrôle directement avec omegad """
+        init_speed = self.vx
+        
+        boost_speed_max = 28 #m/s, valeur provisoire
+        turn_rate = 3 #rad/s, valeur provisoire
+        if init_speed<boost_speed_max :
+            init_speed +=1.5
+
+        self.vx = init_speed
+        self.vy = 0
+        if input_dico["turn_left"] and not input_dico["turn_right"]:
+            self.omegad = turn_rate
+        elif input_dico["turn_right"] and not input_dico["turn_left"]:
+            self.omegad = -turn_rate
+        else:
+            self.omegad = 0
+        for tire in self.list_tires:
+            tire.rot_speed_tire = self.vx / tire.tire_radius #pour que la physique reprenne sans à-coup
+        self.timer_boost -= 1
+        self.boost_flag = True
 
     def special_effect(self):
         """ Effet spécial pour l'étoile, un peu plus rapide et peut être rendre la voiture plsu maniable"""

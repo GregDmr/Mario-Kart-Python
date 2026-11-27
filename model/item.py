@@ -126,8 +126,7 @@ class Mushroom(Item):
         if audio_controller:
             audio_controller.play_sound("kart_boost")
 
-        # Rajouter l'accélération
-        pass
+        player.car.boost()
 
 class Fake_ItemBox(Item):
     def __init__(self, x: float = 0, y: float = 0, track_size: int = 32, icon_size: int = 64):
